@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: True
   remote_user: root
-  pre_tasks:
+  tasks:
     - name: Add IP address,hostname of all hosts to all hosts
       lineinfile:
         dest: /etc/hosts
