@@ -1,7 +1,7 @@
-Proxysql_Ray
+MySQL_Ray
 =========
 
-Automatically deploy the latest version of proxysql based on local installation files.
+Automatically deploy the latest version of mysql based on local installation files,and config mgr architecture and one master and two slave architecture .
 
 Requirements
 ------------
