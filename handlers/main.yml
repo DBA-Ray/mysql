@@ -1,6 +1,5 @@
 ---
 # handlers file for proxysql_ray
-
 - name: Reload systemd
   systemd:
     daemon_reload: yes
@@ -19,4 +18,3 @@
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"
     login_unix_socket: /tmp/mysql.sock
-

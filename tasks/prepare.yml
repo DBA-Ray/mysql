@@ -26,30 +26,24 @@
     - "{{ shelldir }}"
     - "{{ monitordir }}"
 
-#- name: Create directories for the mysql depend
-#  shell: mkdir -p "{{ install_dir }}"{package,mysql,shell,monitor}
-
-#- name: Create a directory for the mysql internal
-#  shell: mkdir -p "{{ basedir }}"{etc,log}
-
 - name: 复制安装包
   copy: 
     src: "{{ package_name }}"
     dest: "{{ package_dir }}"
   run_once: True
 
-#- name: 解压安装包
-#  unarchive:
-#    src: "{{ package_dir }}/{{ package_name }}"
-#    dest: "{{ package_dir }}"
-#    remote_src: yes
-#  run_once: True
+- name: 解压安装包
+  unarchive:
+    src: "{{ package_dir }}/{{ package_name }}"
+    dest: "{{ package_dir }}"
+    remote_src: yes
+  run_once: True
 
-#- name: 复制mysql二进制包
-#  copy:
-#    src: "{{ package_dir }}/{{ mysql_version }}/"
-#    dest: "{{ basedir }}"
-#    remote_src: yes
+- name: 复制mysql二进制包
+  copy:
+    src: "{{ package_dir }}/{{ mysql_version }}/"
+    dest: "{{ basedir }}"
+    remote_src: yes
 
 #- name: 复制日志轮询脚本
 #  copy:

@@ -79,4 +79,3 @@
         (ansible_hostname == "mgr1") or
         (ansible_hostname == "mgr2") or
         (ansible_hostname == "mgr3")
-

@@ -26,5 +26,3 @@
     name: mysqld
     state: started
   notify: Set default_collation_for_utf8mb4 variable to utf8mb4_general_ci
-
-
