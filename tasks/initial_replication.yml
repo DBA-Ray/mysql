@@ -27,5 +27,5 @@
     name: "monitor slowlog"
     minute: "00"
     hour: "09"
-    job: "{{shelldir}}/mysql_slow_digest.sh > /dev/null"
+    job: "{{ shelldir }}/mysql_slow_digest.sh > /dev/null"
   when: mysql_slow_digest

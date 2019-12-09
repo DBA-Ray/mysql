@@ -2,8 +2,8 @@
 - name: Initial mysql server
   shell: "{{ item }}"
   with_items:
-    - "{{basedir}}/bin/mysqld --defaults-file={{etcdir}}/my.cnf --user=mysql --lower-case-table-names=1 --initialize-insecure --basedir={{ basedir }} --datadir={{ datadir }}"
-    - "{{basedir}}/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
+    - "{{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my.cnf --user=mysql --lower-case-table-names=1 --initialize-insecure --basedir={{ basedir }} --datadir={{ datadir }}"
+    - "{{ basedir }}/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
 
 - name: Start mysql server
   systemd:
