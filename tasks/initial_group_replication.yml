@@ -1,0 +1,82 @@
+- name: Rendering config_replication_group.sh.j2
+  template:
+    src: config_replication_group.sh.j2
+    dest: "{{ shelldir }}/config_replication_group.sh"
+    owner: root
+    group: root
+    mode: 0744
+  when: >
+        (ansible_hostname == "mgr1") or
+        (ansible_hostname == "mgr2") or
+        (ansible_hostname == "mgr3")
+
+- name: Set group_replication_start_on_boot=on
+  replace:
+    path: "{{etcdir}}/my.cnf"
+    regexp: 'loose-group_replication_start_on_boot = off'
+    replace: 'loose-group_replication_start_on_boot = on'
+  when: >
+        (ansible_hostname == "mgr1") or
+        (ansible_hostname == "mgr2") or
+        (ansible_hostname == "mgr3")
+
+- name: Config group_replication_bootstrap_group
+  shell: sh -x "{{ shelldir }}/config_replication_group.sh" "{{ root_password }}" "{{ mysql_monitor_password }}"
+  when: > 
+        (ansible_hostname == "mgr1") or
+        (ansible_hostname == "mgr2") or
+        (ansible_hostname == "mgr3")
+
+- name: Config replication for mgr2
+  mysql_replication:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: /tmp/mysql.sock
+    mode: changemaster
+    master_host: mgr2
+    master_port: "{{ mysql_port }}"
+    master_user: repl
+    master_password: "{{ mysql_monitor_password }}"
+    master_auto_position: yes
+  when: mysql_replication and ansible_hostname == "slave_monitor1"
+
+- name: Config replication for mgr3
+  mysql_replication:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: /tmp/mysql.sock
+    mode: changemaster
+    master_host: mgr3
+    master_port: "{{ mysql_port }}"
+    master_user: repl
+    master_password: "{{ mysql_monitor_password }}"
+    master_auto_position: yes
+  when: mysql_replication and ansible_hostname == "slave_monitor2"
+
+- name: Rendering mysql_slow_digest.sh.j2
+  template:
+    src: mysql_slow_digest.sh.j2
+    dest: "{{ shelldir }}/mysql_slow_digest.sh"
+    owner: root
+    group: root
+    mode: 0744
+  when: >
+        (mysql_slow_digest) and
+        (ansible_hostname == "mgr1") or
+        (ansible_hostname == "mgr2") or
+        (ansible_hostname == "mgr3")
+
+- name: Add a job to monitor slow logs
+  cron:
+    name: "monitor slowlog"
+    minute: "00"
+    hour: "09"
+    job: "{{shelldir}}/mysql_slow_digest.sh > /dev/null"
+  when: >
+        (mysql_slow_digest) and 
+        (ansible_hostname == "mgr1") or
+        (ansible_hostname == "mgr2") or
+        (ansible_hostname == "mgr3")
+

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+#自动根据cpu逻辑核心数计算出innodb并发线程数、读线程数和写线程数
+
+#基准运算常量
+
+a=7
+
+b=10
+
+c=2
+
+processor=`cat /proc/cpuinfo |grep "processor"|wc -l`
+
+innodb_thread_concurrency=`expr $processor \* $c`
+
+innodb_read_io_threads=`expr $processor \* $a / $b`
+
+innodb_write_io_threads=`expr $processor - $innodb_read_io_threads`
+
+#自动根据memory计算出innodb缓冲池大小
+
+mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'`
+
+innodb_buffer_pool=`expr $mem \* $a / $b`
+
+#自动赋值server_id,取IP最后一位
+
+server_id=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $4}'`
+
+d=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $1}'`
+
+e=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $2}'`
+
+g=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $3}'`
+
+f=`ip a|grep {{ ansible_eth0['ipv4']['address'] }}|awk '{print $2}'|tr -d "addr:"|sed 's/.*\(..\)$/\1/'`
+
+whitelist=`echo "$d.$e.$g.0/$f"`
+
+user_whitelist=`echo "$d.$e.$g.%"`
+
+group_replication_group_seeds=`cat /etc/hosts|grep proxysql|awk '{print $1}'|awk '{print $0":33771"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
+
+incre_offset_tmp=`cat /etc/hostname`
+
+incre_offset=`echo ${incre_offset_tmp: -1}`
+
+auto_increment=`cat /etc/hosts | grep proxysql | awk 'END{print NR}'`
+
+sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my.cnf
+
+sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my.cnf 
+
+sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my.cnf
+
+sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my.cnf
+
+sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my.cnf
+
+sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
+
+sed -i 's|group_replication_ip_whitelist = 1|group_replication_ip_whitelist = '"${whitelist}"'|g' {{ etcdir }}/my.cnf
+
+echo $user_whitelist > /tmp/user_whitelist.txt
+
+if [ {{ mutli_primary }} == True -a {{ mysql_traditional_replication }} == False ]
+
+then
+
+sed -i 's/auto_increment_offset = 1/auto_increment_offset = '"${incre_offset}"'/g' {{ etcdir }}/my.cnf
+
+sed -i 's/auto_increment_increment = 1/auto_increment_increment = '"${auto_increment}"'/g' {{ etcdir }}/my.cnf
+
+fi

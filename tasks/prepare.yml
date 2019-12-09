@@ -1,0 +1,130 @@
+# 复制proxysql安装包、mysql客户端和初始化sql脚本
+- hostname:
+    name: "{{ ansible_hostname }}"
+
+- name: Ensure group "mysql" exists
+  group:
+    name: mysql
+    state: present
+
+- name: Ensure the user "mysql" exists
+  user:
+    name: mysql
+    group: mysql
+
+- name: Create a directory for the my.cnf file
+  file: path={{ item }} state=directory owner=mysql group=mysql
+  with_items: 
+    - "{{ etcdir }}"
+    - "{{ logdir }}"
+
+- name: Create a directory for the my.cnf file
+  file: path={{ item }} state=directory owner=root group=root
+  with_items:
+    - "{{ package_dir }}"
+    - "{{ basedir }}"
+    - "{{ shelldir }}"
+    - "{{ monitordir }}"
+
+#- name: Create directories for the mysql depend
+#  shell: mkdir -p "{{ install_dir }}"{package,mysql,shell,monitor}
+
+#- name: Create a directory for the mysql internal
+#  shell: mkdir -p "{{ basedir }}"{etc,log}
+
+- name: 复制安装包
+  copy: 
+    src: "{{ package_name }}"
+    dest: "{{ package_dir }}"
+  run_once: True
+
+#- name: 解压安装包
+#  unarchive:
+#    src: "{{ package_dir }}/{{ package_name }}"
+#    dest: "{{ package_dir }}"
+#    remote_src: yes
+#  run_once: True
+
+#- name: 复制mysql二进制包
+#  copy:
+#    src: "{{ package_dir }}/{{ mysql_version }}/"
+#    dest: "{{ basedir }}"
+#    remote_src: yes
+
+#- name: 复制日志轮询脚本
+#  copy:
+#    src: "{{ package_dir }}proxysql" 
+#    dest: /etc/logrotate.d/proxysql
+#    remote_src: yes 
+
+- name: 把mysql执行路径添加至环境变量
+  lineinfile:
+    path: /etc/profile
+    line: export PATH={{ basedir }}/bin:$PATH
+    insertafter: EOF
+    state: present
+  notify: Source profile
+  register: source
+
+- name: Rendering mysql parameter file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mysql
+    group: mysql
+    mode: 0644
+  with_items: 
+    - { src: 'mysql.conf.j2', dest: '/usr/lib/tmpfiles.d/mysql.conf' }
+    - { src: 'mysqld.service.j2', dest: '/usr/lib/systemd/system/mysqld.service' }
+    - { src: 'my.cnf.j2', dest: "{{ etcdir }}/my.cnf" }
+
+- name: Rendering bash file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0744
+  with_items: 
+    - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
+    - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log.sh" }
+
+- name: Auto config my.cnf
+  shell: sh -x "{{ etcdir }}/my.cnf_auto.sh"
+
+- name: Obtain user_whitelist
+  shell: cat /tmp/user_whitelist.txt
+  register: user_whitelist
+
+#- name: 实现日志轮转免密登录刷新日志
+#  command: /usr/bin/expect "{{ package_dir }}"mysql_config_editor.sh
+
+#- name: 实现日志轮转免密登录刷新日志
+#  shell: |
+    #set timeout 300
+#    spawn mysql_config_editor set --login-path=proxysql --host=127.0.0.1 -P 6032 --user=admin --password
+
+#    expect "Enter password:"
+#    send "{{ admin_login_password }}\n"
+
+#    expect " Continue? (Press y|Y for Yes, any other key for No) :"
+#    send "y\n"
+
+#    exit 0
+#  args:
+#    executable: /usr/bin/expect
+#  delegate_to: localhost
+
+#- name: Case sensitive password string match
+#  expect:
+#    command: mysql_config_editor set --login-path=proxysql --host=127.0.0.1 -P 6032 --user=admin --password
+#    responses:
+#      (?i)password: "{{ admin_login_password }}"
+  #no_log: true
+
+#- name: 添加日志轮询任务计划
+#  cron:
+#    name: "logrotate"
+#    minute: "55"
+#    hour: "23"
+#    job: "/usr/sbin/logrotate -vf -s /var/lib/logrotate/logrotate.status /etc/logrotate.d/proxysql > /dev/null"

@@ -1,0 +1,22 @@
+---
+# handlers file for proxysql_ray
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Wait for MySQL is running
+  pause: seconds=3
+
+- name: Source profile
+  shell: source /etc/profile
+
+- name: Set default_collation_for_utf8mb4 variable to utf8mb4_general_ci
+  mysql_variables:
+    variable: default_collation_for_utf8mb4
+    value: utf8mb4_general_ci
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: /tmp/mysql.sock
+

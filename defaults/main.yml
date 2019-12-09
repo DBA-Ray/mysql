@@ -1,0 +1,35 @@
+---
+# defaults file for proxysql_ray
+# 是否启用组复制
+mysql_group_replication: True
+mutli_primary: false
+single_primary: true
+# 组复制架构中是否包含传统复制
+mysql_replication: False
+# 搭建一主两从复制架构
+mysql_traditional_replication: False
+# 是否开启自动分析慢查询
+mysql_slow_digest: True
+# 是否安装percona tools
+percona_tools: True
+# 是否升级安装
+is_update: False
+# ansible所在主机IP
+ansible_local_host: 10.0.64.43
+# 目录路径
+mysql_upgrade_package: mysql-8.0.18-el7-x86_64.tar.gz
+mysql_upgrade_version: mysql-8.0.18-el7-x86_64
+mysql_version: mysql-8.0.18-el7-x86_64
+package_name: "{{ mysql_version }}.tar.gz"
+install_dir: /var/local
+package_dir: "{{ install_dir }}/package"
+basedir: "{{ install_dir }}/mysql"
+shelldir: "{{ install_dir }}/shell"
+monitordir: "{{ install_dir }}/monitor"
+datadir: "{{ basedir }}/data"
+etcdir: "{{ basedir }}/etc"
+logdir: "{{ basedir }}/log"
+# 基本参数
+mysql_port: 3388
+max_connections: 10000
+timeout: 28800

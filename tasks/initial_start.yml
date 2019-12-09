@@ -1,0 +1,66 @@
+#initial and start mysql server
+- name: Initial mysql server
+  shell: "{{ item }}"
+  with_items:
+    - "{{basedir}}/bin/mysqld --defaults-file={{etcdir}}/my.cnf --user=mysql --lower-case-table-names=1 --initialize-insecure --basedir={{ basedir }} --datadir={{ datadir }}"
+    - "{{basedir}}/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
+
+- name: Start mysql server
+  systemd:
+    name: mysqld
+    state: started
+
+- name: Enable mysql server
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Modify root password
+  mysql_user:
+    login_user: root
+    login_password: 
+    name: root
+    password: "{{ root_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    priv: '*.*:ALL,GRANT'
+    login_unix_socket: /tmp/mysql.sock
+    state: present
+
+- name: Add repl user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: repl
+    password: "{{ mysql_monitor_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ user_whitelist.stdout }}"
+    priv: '*.*:REPLICATION SLAVE,SELECT'
+    sql_log_bin: no
+    login_unix_socket: /tmp/mysql.sock
+    state: present
+
+- name: Set semisync parameter
+  mysql_variables:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: /tmp/mysql.sock
+    variable: "{{ item.original }}"
+    value: "{{ item.change }}"
+  with_items: 
+    - { original: 'rpl_semi_sync_slave_enabled', change: '1' }
+    - { original: 'rpl_semi_sync_master_enabled', change: '1' }
+    - { original: 'rpl_semi_sync_master_timeout', change: '1000' }
+
+- name: Modify semisync parameter in my.cnf
+  replace:
+    path: "{{etcdir}}/my.cnf"
+    regexp: "{{ item.original }}"
+    replace: "{{ item.change }}"
+  with_items:
+    - { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
+    - { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
+    - { original: '#rpl_semi_sync_master_timeout = 1000', change: 'rpl_semi_sync_master_timeout = 1000' }

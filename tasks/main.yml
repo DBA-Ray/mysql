@@ -1,0 +1,25 @@
+---
+# tasks file for mysql_ray
+- include: password.yml
+  when: not is_update 
+ 
+- include: system_check.yml
+  when: not is_update
+
+- include: prepare.yml
+  when: not is_update  
+
+- include: initial_start.yml
+  when: not is_update
+
+- include: initial_group_replication.yml
+  when: not is_update and mysql_group_replication
+
+- include: initial_replication.yml
+  when: not is_update and mysql_traditional_replication
+
+- include: install_tools.yml
+  when: not is_update and percona_tools
+
+- include: upgrade.yml
+  when: is_update

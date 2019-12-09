@@ -1,0 +1,37 @@
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+
+Type=notify
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Start main service
+ExecStart={{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my.cnf $MYSQLD_OPTS 
+
+# Use this to switch malloc implementation
+EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 21010
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+# Set environment variable MYSQLD_PARENT_PID. This is required for restart.
+Environment=MYSQLD_PARENT_PID=1
+
+PrivateTmp=false
+
