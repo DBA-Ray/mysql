@@ -57,7 +57,7 @@
 
 - name: Modify semisync parameter in my.cnf
   replace:
-    path: "{{etcdir}}/my.cnf"
+    path: "{{ etcdir }}/my.cnf"
     regexp: "{{ item.original }}"
     replace: "{{ item.change }}"
   with_items:

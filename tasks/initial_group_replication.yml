@@ -11,7 +11,7 @@
 
 - name: Set group_replication_start_on_boot=on
   replace:
-    path: "{{etcdir}}/my.cnf"
+    path: "{{ etcdir }}/my.cnf"
     regexp: 'loose-group_replication_start_on_boot = off'
     replace: 'loose-group_replication_start_on_boot = on'
   when: >
