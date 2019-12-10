@@ -10,7 +10,7 @@ then
 
 fi
 
-if [ "{{ ansible_hostname }}" == "proxysql2" ]
+if [ "{{ ansible_hostname }}" == "mgr1" ]
 
 then
 
@@ -19,16 +19,10 @@ mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE AL
 		        SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION; \
 			SET GLOBAL group_replication_bootstrap_group=OFF;"
 
-#sleep 3
-
-#mysql -uroot -p${1} -S /tmp/mysql.sock -e "INSTALL PLUGIN RPL_SEMI_SYNC_MASTER SONAME 'semisync_master.so';INSTALL PLUGIN RPL_SEMI_SYNC_SLAVE SONAME 'semisync_slave.so';"
+mysql -uroot -p${1} -S /tmp/mysql.sock < /tmp/mgr_monitor.sql
 
 else
 
 mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
-
-#sleep 3
-
-#mysql -uroot -p${1} -S /tmp/mysql.sock -e "INSTALL PLUGIN RPL_SEMI_SYNC_MASTER SONAME 'semisync_master.so';INSTALL PLUGIN RPL_SEMI_SYNC_SLAVE SONAME 'semisync_slave.so';"
 
 fi

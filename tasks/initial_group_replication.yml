@@ -6,9 +6,8 @@
     group: root
     mode: 0744
   when: >
-        (ansible_hostname == "mgr1") or
-        (ansible_hostname == "mgr2") or
-        (ansible_hostname == "mgr3")
+        ( ansible_hostname != "slave_monitor1" ) and
+        ( ansible_hostname != "slave_monitor2" )
 
 - name: Set group_replication_start_on_boot=on
   replace:
@@ -16,16 +15,18 @@
     regexp: 'loose-group_replication_start_on_boot = off'
     replace: 'loose-group_replication_start_on_boot = on'
   when: >
-        (ansible_hostname == "mgr1") or
-        (ansible_hostname == "mgr2") or
-        (ansible_hostname == "mgr3")
+        ( ansible_hostname != "slave_monitor1" ) and
+        ( ansible_hostname != "slave_monitor2" )
+
+- name: Copy the mgr_monitor.sql
+  copy: src=mgr_monitor.sql dest=/tmp
+  when: ansible_hostname == "mgr1"
 
 - name: Config group_replication_bootstrap_group
   shell: sh -x "{{ shelldir }}/config_replication_group.sh" "{{ root_password }}" "{{ mysql_monitor_password }}"
   when: > 
-        (ansible_hostname == "mgr1") or
-        (ansible_hostname == "mgr2") or
-        (ansible_hostname == "mgr3")
+        ( ansible_hostname != "slave_monitor1" ) and
+        ( ansible_hostname != "slave_monitor2" )
 
 - name: Config replication for mgr2
   mysql_replication:
@@ -63,10 +64,9 @@
     group: root
     mode: 0744
   when: >
-        (mysql_slow_digest) and
-        (ansible_hostname == "mgr1") or
-        (ansible_hostname == "mgr2") or
-        (ansible_hostname == "mgr3")
+        ( mysql_slow_digest ) and
+        ( ansible_hostname != "slave_monitor1" ) and
+        ( ansible_hostname != "slave_monitor2" )
 
 - name: Add a job to monitor slow logs
   cron:
@@ -75,7 +75,6 @@
     hour: "09"
     job: "{{ shelldir }}/mysql_slow_digest.sh > /dev/null"
   when: >
-        (mysql_slow_digest) and 
-        (ansible_hostname == "mgr1") or
-        (ansible_hostname == "mgr2") or
-        (ansible_hostname == "mgr3")
+        ( mysql_slow_digest ) and
+        ( ansible_hostname != "slave_monitor1" ) and
+        ( ansible_hostname != "slave_monitor2" )
