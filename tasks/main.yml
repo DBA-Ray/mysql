@@ -21,5 +21,9 @@
 - include: install_tools.yml
   when: not is_update and percona_tools
 
+- include: auto_xtrabackup.yml
+  when: not is_update
+  run_once: True
+
 - include: upgrade.yml
   when: is_update
