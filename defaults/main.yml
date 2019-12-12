@@ -1,9 +1,11 @@
 ---
 # defaults file for proxysql_ray
+# 是否安装单机版
+is_standalone: False
 # 是否启用组复制
-mysql_group_replication: True
-mutli_primary: false
-single_primary: true
+mysql_group_replication: False
+mutli_primary: False
+single_primary: True
 # 组复制架构中是否包含传统复制
 mysql_replication: False
 # 搭建一主两从复制架构
@@ -11,7 +13,9 @@ mysql_traditional_replication: False
 # 是否开启自动分析慢查询
 mysql_slow_digest: True
 # 是否安装percona tools
-percona_tools: True
+percona_tools: False
+# 是否部署自动备份
+auto_xtrabackup: True
 # 是否升级安装
 is_update: False
 # ansible所在主机IP
