@@ -12,13 +12,13 @@
     name: mysql
     group: mysql
 
-- name: Create a directory for the my.cnf file
+- name: Create a directory for the my.cnf file and log file
   file: path={{ item }} state=directory owner=mysql group=mysql
   with_items: 
     - "{{ etcdir }}"
     - "{{ logdir }}"
 
-- name: Create a directory for the my.cnf file
+- name: Create a directory for mysql
   file: path={{ item }} state=directory owner=root group=root
   with_items:
     - "{{ package_dir }}"

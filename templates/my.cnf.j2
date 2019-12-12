@@ -51,7 +51,7 @@
   relay_log_index = relay.index 
  
 # MGR group_replication 变量加上 "loose" ，则可写入 my.cnf 配置文件中。
-  plugin-load = group_replication.so;semisync_master.so;semisync_slave.so
+  plugin-load = group_replication.so;semisync_master.so;semisync_slave.so;mysql_clone.so
   transaction_isolation = READ-COMMITTED
   loose-group_replication_group_name = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" #组的名字可以随便起,但不能用主机的GTID（为mgr高可用组起一个名字，这个名字一定要是uuid格式的，所有节点一致）
   loose-group_replication_start_on_boot = off #启动后自动启动组复制。

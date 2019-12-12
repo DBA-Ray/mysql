@@ -1,0 +1,24 @@
+#/bin/bash
+#author DBA RL
+
+xtrabackup_full_dir={{ backupdir }}/shell/databak/{{ ansible_hostname }}/{{ xtrabackup_full }}
+
+xtrabackup_full_file=${xtrabackup_full_dir}.tgz
+
+xtrabackup_incr_base_dir={{ backupdir }}/archive
+
+tar -zxvf $xtrabackup_full_file
+
+xtrabackup --prepare --apply-log-only --target-dir=$xtrabackup_full_dir
+
+for i in $(ls $xtrabackup_incr_base_dir/*.tgz);do tar zxvf $i;done
+
+for i in $(ls -d $xtrabackup_incr_base_dir/*_incr)
+
+do 
+
+xtrabackup --prepare --apply-log-only --target-dir=$xtrabackup_full_dir --incremental-dir=$i
+
+done
+
+xtrabackup --prepare --target-dir=$xtrabackup_full_dir

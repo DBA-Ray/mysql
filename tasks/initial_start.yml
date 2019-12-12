@@ -25,7 +25,7 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     priv: '*.*:ALL,GRANT'
-    login_unix_socket: /tmp/mysql.sock
+    login_unix_socket: "{{ socket }}"
     state: present
 
 - name: Add repl user
@@ -39,7 +39,7 @@
     host: "{{ user_whitelist.stdout }}"
     priv: '*.*:REPLICATION SLAVE,SELECT'
     sql_log_bin: no
-    login_unix_socket: /tmp/mysql.sock
+    login_unix_socket: "{{ socket }}"
     state: present
 
 - name: Set semisync parameter
@@ -47,7 +47,7 @@
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"
-    login_unix_socket: /tmp/mysql.sock
+    login_unix_socket: "{{ socket }}"
     variable: "{{ item.original }}"
     value: "{{ item.change }}"
   with_items: 
