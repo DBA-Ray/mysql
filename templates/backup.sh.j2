@@ -16,6 +16,8 @@ backupdir={{ backupdir }}
 
 monitor="$backupdir/monitor/mysql_hotbackup_status.txt" ##zabbix监控文件
 
+shelldir={{ backupdir }}/shell
+
 ##几点开始全量备份，不等于这个时间做增量备份
 n=070001 
 n1=120001
@@ -63,10 +65,6 @@ function check_status()
     fi
 
 }
-
-###check dir is exist or not####
-
-init_dir
 
 ###according to backup policy to run xtrabackup###
 

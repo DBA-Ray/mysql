@@ -6,12 +6,12 @@
     - "{{ backupdir }}/log/xtrabackup_log"
     - "{{ backupdir }}/monitor"
     - "{{ backupdir }}/shell"
-    - "{{ backupdir }}/shell/databak/{{ ansible_hostname }}"
+    - "{{ backupdir }}/databak/{{ ansible_hostname }}"
     - "{{ backupdir }}/archive"
   when: ansible_hostname == "slave_monitor1" or
         ansible_hostname == "slave_monitor2" or
         ansible_hostname == "slave1" or
-        ansible_hostname == "slave2"
+        ansible_hostname == "proxysql2"
 
 - name: Rendering xtrabackup script file
   template:
@@ -21,21 +21,21 @@
     group: mysql
     mode: 0744
   with_items:
-    - { src: 'backup.sh.j2', dest: {{ shelldir }} }
-    - { src: 'mysql_xtrabackup.sh.j2', dest: "{{ backupdir }}/shell" }
-    - { src: 'xtra_data_archiving.sh.j2', dest: "{{ backupdir }}/shell" }
+    - { src: 'backup.sh.j2', dest: "{{ backupdir }}/shell/backup.sh" }
+    - { src: 'mysql_xtrabackup.sh.j2', dest: "{{ backupdir }}/shell/mysql_xtrabackup.sh" }
+    - { src: 'xtra_data_archiving.sh.j2', dest: "{{ backupdir }}/shell/xtra_data_archiving.sh" }
   when: ansible_hostname == "slave_monitor1" or
         ansible_hostname == "slave_monitor2" or
         ansible_hostname == "slave1" or
-        ansible_hostname == "slave2"
+        ansible_hostname == "proxysql2"
 
 - name: Add automatic backup task schedule
   cron:
     name: "automatic backup"
     minute: "00"
     hour: "*/1"
-    job: "{{ shelldir }}backup.sh > /dev/null"
+    job: "{{ backupdir }}/shell/backup.sh > /dev/null"
   when: ansible_hostname == "slave_monitor1" or
         ansible_hostname == "slave_monitor2" or
         ansible_hostname == "slave1" or
-        ansible_hostname == "slave2"
+        ansible_hostname == "proxysql2"

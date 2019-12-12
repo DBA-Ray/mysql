@@ -6,9 +6,6 @@
 - include: system_check.yml
   when: not is_update
 
-- include: prepare.yml
-  when: not is_update
-
 - include: initial_start.yml
   when: not is_update and is_standalone
 
