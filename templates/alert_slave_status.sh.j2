@@ -1,0 +1,144 @@
+#!/bin/bash
+
+#Author DBA R
+
+## Find the location of the mysql.sock file ##
+
+#获取当前目录
+
+#source /etc/profile
+
+monitor_passwd={{ mysql_monitor_password }}
+
+#向钉钉发送消息方法
+function SendMessageToDingding()
+{ # 发送钉钉消息
+Dingding_Url="https://oapi.dingtalk.com/robot/send?access_token=134b660cd50a6410cb77d4b75ccbf65e4cd387ffcfc8347a9161910a751d3330" 
+curl "${Dingding_Url}" -H 'Content-Type: application/json' -d "
+ { \"msgtype\":\"text\",
+\"text\":{
+\"content\":\"${1}\"},
+\"at\":{
+\"atMobiles\":[\"15668661298\"],
+\"isAtAll\":false} }"
+}
+
+function check_for_socket () {
+        if [ -z $socket ] ; then
+                if [ -S /var/lib/mysql/mysql.sock ] ; then
+                        socket=/var/lib/mysql/mysql.sock
+                elif [ -S /tmp/mysql.sock ] ; then
+                        socket=/tmp/mysql.sock
+                else
+                        ps_socket=`netstat -ln | egrep "mysql(d)?\.sock" | awk '{ print $9 }'`
+                        if [ "$ps_socket" ] ; then
+                        socket=$ps_socket
+                        fi
+                fi
+        fi
+        if [ -S "$socket" ] ; then
+                echo UP > /dev/null
+        else
+		        tmp_localip=`/sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|grep -v 172.17|grep -v 172.18|awk '{print $2}'|tr -d "addr:"`
+                localip=`echo $tmp_localip|awk '{print $1}'|sed -n '1p'`
+                echo "No valid socket file "$socket" found!"
+                echo "mysqld is not running or it is installed in a custom location on server $localip" | mail -v -s "alert_slave" rulei@jjl.cn
+                SendMessageToDingding "mysqld is not running or it is installed in a custom location on server $localip"
+                echo "Please set the $socket variable at the top of this script."
+                exit 1
+        fi
+}
+
+check_for_socket
+
+function slave_status() {
+local variable1=`mysql -h$4 -u$5 -p$6 -P$7 -e "show slave status\G" | grep Slave_IO_Running: | awk '{ print $2 }'`
+local variable2=`mysql -h$4 -u$5 -p$6 -P$7 -e "show slave status\G" | grep Slave_SQL_Running: | awk '{ print $2 }'`
+local variable3=`mysql -h$4 -u$5 -p$6 -P$7 -e "show slave status\G" | grep Last_Error: | awk '{ print $2 }'`
+export "$1"=$variable1
+export "$2"=$variable2
+export "$3"=$variable3
+}
+
+function slave_status_alert () {
+
+if [ "${Last_Error}" = "" ] ; then
+
+Last_Error="无错误信息"
+
+echo ${Last_Error}
+
+fi
+
+if [ -z $1 -o -z $2 ] ; then
+        echo "Replication is not configured or you do not have the required access to MySQL on server $3!"|mail -v -s "$3" rulei@jjl.cn
+		SendMessageToDingding "Replication is not configured \nor you do not have the required access to MySQL on server $3!"
+fi
+
+if [ $2 == 'No' ] ; then
+        echo "SQL thread not running on server $3!Last Error:${Last_Error}"|mail -v -s "$3" rulei@jjl.cn
+        SendMessageToDingding "SQL thread not running on server $3!\nLast Error:${Last_Error}"
+elif [ $1 == 'No' ] ; then
+        echo "IO thread not running on server $3!Last Error:${Last_Error}"|mail -v -s "$3" rulei@jjl.cn
+        SendMessageToDingding "IO thread not running on server $3!\nLast Error:${Last_Error}"
+elif [ $1 == 'No' ] && [ $2 == 'No' ] ; then
+        echo "Replication slave is inactive on server $3!Last Error:${Last_Error}"|mail -v -s "$3" rulei@jjl.cn
+        SendMessageToDingding "Replication slave is inactive on server $3!\nLast Error:${Last_Error}"
+fi
+}
+
+function human_readable_time () {
+
+########################################################################
+#                                                                      #
+#       Function to produce human readable time                        #
+#                                                                      #
+########################################################################
+
+        usage="$0 seconds 'variable'"
+        if [ -z $1 ] || [ -z $2 ] ; then
+                echo $usage $red
+                exit 1
+        fi
+        days=$(echo "scale=0 ; $1 / 86400" | bc -l)
+        remainder=$(echo "scale=0 ; $1 % 86400" | bc -l)
+        hours=$(echo "scale=0 ; $remainder / 3600" | bc -l)
+        remainder=$(echo "scale=0 ; $remainder % 3600" | bc -l)
+        minutes=$(echo "scale=0 ; $remainder / 60" | bc -l)
+        seconds=$(echo "scale=0 ; $remainder % 60" | bc -l)
+        export $2="$days"days"$hours"hrs"$minutes"min"$seconds"sec""
+}
+
+function slave_delay_status () {
+local variable=`mysql -h$2 -u$3 -p$4 -P$5 -e "show slave status\G" | grep Seconds_Behind_Master: | awk '{ print $2 }'`
+export "$1"=$variable
+}
+
+function slave_delay_status_alert () {
+
+if [ "$1" = 'NULL' ] || [ "$1" = '' ] ; then
+	echo "Unknown Offset - perhaps slave is stopped or not configured on server $3!" | mail -v -s "$3" rulei@jjl.cn
+	SendMessageToDingding "Unknown Offset - perhaps slave is stopped or not configured on server $3"
+fi
+
+if [ "$1" -gt 3 ];then
+        echo "The data replication latency is "$2",so keep an eye on server $3" | mail -v -s "$3"  rulei@jjl.cn
+        SendMessageToDingding "The data replication latency is "$2"!\nso keep an eye on server $3"
+fi
+}
+
+grep -v "^$" /etc/hosts|grep -v "^#"|grep slave|awk '{print $1,$2}'| while read ip hostname
+
+do
+
+slave_status Slave_IO Slave_SQL Last_Error ${ip} repl ${monitor_passwd} 3377
+
+slave_status_alert ${Slave_IO} ${Slave_SQL} Alert_${hostname}_pro
+
+slave_delay_status seconds ${ip} repl ${monitor_passwd} 3377
+
+human_readable_time ${seconds} seconds_readable
+
+slave_delay_status_alert ${seconds} ${seconds_readable} Alert_${hostname}_pro
+
+done

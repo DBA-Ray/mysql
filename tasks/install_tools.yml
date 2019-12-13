@@ -21,4 +21,4 @@
   register: result
   retries: 7
   until: result is succeeded
-  when: ansible_hostname != "slave_monitor1"
+  when: ansible_hostname != "ansible"

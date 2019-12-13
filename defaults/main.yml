@@ -16,6 +16,15 @@ mysql_slow_digest: True
 percona_tools: False
 # 是否部署自动备份
 auto_xtrabackup: True
+xtrabackup_full: "{{ ansible_hostname }}_xxx_full"
+# 是否部署监控复制状态脚本和发送慢查询分析脚本
+auto_monitor: True
+recipient: rulei@jjl.cn
+# 是否部署pmm监控服务
+auto_pmm: True
+# Set custom env for additional options
+pmm_server_env_custom: {}
+pmm_server_http_port: 7070
 # 是否升级安装
 is_update: False
 # ansible所在主机IP
@@ -39,4 +48,3 @@ socket: /tmp/mysql.sock
 mysql_port: 3377
 max_connections: 10000
 timeout: 28800
-xtrabackup_full: "{{ ansible_hostname }}_xxx_full"
