@@ -1,35 +1,20 @@
 ---
 # defaults file for proxysql_ray
-# 是否安装单机版
-is_standalone: False
-# 是否启用组复制
-mysql_group_replication: False
+# Single-primary or primary
 mutli_primary: False
 single_primary: True
-# 组复制架构中是否包含传统复制
-mysql_replication: False
-# 搭建一主两从复制架构
-mysql_traditional_replication: False
-# 是否开启自动分析慢查询
+# Whether to enable analysis slow log
 mysql_slow_digest: True
-# 是否安装percona tools
-percona_tools: False
-# 是否部署自动备份
-auto_xtrabackup: True
+# Archived base path
 xtrabackup_full: "{{ ansible_hostname }}_xxx_full"
-# 是否部署监控复制状态脚本和发送慢查询分析脚本
-auto_monitor: True
+# Define recipients for send mail
 recipient: rulei@jjl.cn
-# 是否部署pmm监控服务
-auto_pmm: True
-# Set custom env for additional options
+# Set custom env for pmm additional options
 pmm_server_env_custom: {}
 pmm_server_http_port: 7070
-# 是否升级安装
-is_update: False
-# ansible所在主机IP
+# ansible host IP
 ansible_local_host: 10.0.64.43
-# 目录路径
+# Directory path
 mysql_upgrade_package: mysql-8.0.18-el7-x86_64.tar.gz
 mysql_upgrade_version: mysql-8.0.18-el7-x86_64
 mysql_version: mysql-8.0.18-el7-x86_64
@@ -44,7 +29,7 @@ datadir: "{{ basedir }}/data"
 etcdir: "{{ basedir }}/etc"
 logdir: "{{ basedir }}/log"
 socket: /tmp/mysql.sock
-# 基本参数
+# Basic parameters
 mysql_port: 3377
 max_connections: 10000
 timeout: 28800

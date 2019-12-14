@@ -1,0 +1,40 @@
+- name: Add pmm user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: pmm
+    password: "{{ mysql_monitor_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: localhost
+    priv: '*.*:SELECT, PROCESS, SUPER, REPLICATION CLIENT, RELOAD'
+    sql_log_bin: yes
+    login_unix_socket: "{{ socket }}"
+    state: present
+  when: ansible_hostname == "mgr1" or
+        ansible_hostname == "master"
+
+- name: Config pmm server via pmm-admin
+  shell: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password {{pmm_password}}"
+  args:
+    executable: /bin/bash
+
+- name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
+  shell: "pmm-admin add mysql --user pmm --password {{pmm_password}}"
+  args:
+    executable: /bin/bash
+  loop:
+    - "{{ hostvars[groups['mgr']]['inventory_hostname'] }}"
+    - "{{ hostvars[groups['slave_monitor']]['inventory_hostname'] }}"
+    - "{{ hostvars[groups['mysql']]['inventory_hostname'] }}"
+  when: ansible_hostname in item
+
+- name: Add proxysql via pmm-admin for proxysql group
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+  with_items:
+    - pmm-admin add proxysql:metrics --dsn "stats:stats@tcp(localhost:6032)/"
+    - pmm-admin add linux:metrics
+  when: ansible_hostname = "proxysql1" or
+        ansible_hostname = "proxysql2"

@@ -10,10 +10,13 @@
   when: is_standalone
 
 - include: initial_group_replication.yml
-  when: mysql_group_replication
+  when: is_standalone and mysql_group_replication
+
+- include: initial_slave_monitor.yml
+  when: is_standalone and mysql_group_replication and slave_monitor_replication
 
 - include: initial_replication.yml
-  when: mysql_traditional_replication
+  when: is_standalone and mysql_traditional_replication
 
 - include: install_tools.yml
   when: percona_tools
@@ -24,8 +27,11 @@
 - include: auto_monitor.yml
   when: auto_monitor
 
-- inclued: auto_pmm.yml
-  when: auto_pmm
+- inclued: auto_pmm_send_logs.yml
+  when: auto_pmm_seng_logs
+
+- include: auto_config_pmm.yml
+  when: auto_config_pmm
 
 - include: upgrade.yml
   when: is_update

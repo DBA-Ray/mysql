@@ -21,4 +21,3 @@
   register: result
   retries: 7
   until: result is succeeded
-  when: ansible_hostname != "ansible"

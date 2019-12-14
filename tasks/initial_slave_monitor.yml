@@ -1,0 +1,27 @@
+- name: Config replication for mgr2
+  mysql_replication:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    mode: changemaster
+    master_host: mgr2
+    master_port: "{{ mysql_port }}"
+    master_user: repl
+    master_password: "{{ mysql_monitor_password }}"
+    master_auto_position: yes
+  when: mysql_replication and ansible_hostname == "slave_monitor1"
+
+- name: Config replication for mgr3
+  mysql_replication:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    mode: changemaster
+    master_host: mgr3
+    master_port: "{{ mysql_port }}"
+    master_user: repl
+    master_password: "{{ mysql_monitor_password }}"
+    master_auto_position: yes
+  when: mysql_replication and ansible_hostname == "slave_monitor2"

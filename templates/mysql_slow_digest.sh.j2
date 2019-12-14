@@ -17,4 +17,4 @@ pt-query-digest --report --since "${starttime}" --until "${endtime}" $logdir/$sl
 
 find $monitordir/ -mtime +2 -name "*.txt" -exec rm -rf {} \;
 
-scp $monitordir/$dailyfile root@slave_monitor1:/tmp/
+scp $monitordir/$dailyfile root@ansible:/tmp/

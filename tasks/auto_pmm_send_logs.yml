@@ -1,0 +1,77 @@
+- name: Rendering mysql_slow_collect_send.sh script file
+  template:
+    src: mysql_slow_collect_send.sh.j2
+    dest: "{{ shelldir }}/mysql_slow_collect_send.sh"
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Copy the mail body file and example file
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: 'main_body.txt', dest: "{{ monitordir }}/main_body.txt" }
+    - { src: 'slow_digest_example.docx', dest: "{{ monitordir }}/slow_digest_example.docx" }
+
+- name: ADD automatically collect slow logs and send them to DBA via email
+  cron:
+    name: "automatically collect slow logs and send them to DBA via email"
+    minute: "10"
+    hour: "09"
+    job: "{{ shelldir }}/mysql_slow_collect_send.sh > /dev/null"
+
+- name: Install docker
+  yum:
+    name: docker
+    state: latest
+
+- name: Enable docker server
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Copy docker directory to installdir
+  copy: src=/var/lib/docker dest={{ installdir }}/ remote_src=yes
+
+- name: Create a symbolic link
+  file:
+    src: {{ installdir }}/docker
+    dest: /var/lib/docker
+    owner: root
+    group: root
+    state: link
+  notify: Reload systemd
+
+- name: Start docker server
+  systemd:
+    name: docker
+    state: started
+
+- name: Creating PMM Data Container
+  docker_container:
+    name: pmm-data
+    image: percona/pmm-server:latest
+    state: present
+    volumes:
+    - /opt/prometheus/data
+    - /opt/consul-data
+    - /var/lib/mysql
+    - /var/lib/grafana
+    command: /bin/true 
+
+- name: Running PMM Data Container secured with pmm_server_username and pmm_server_password
+  docker_container:
+    name: pmm-server
+    image: percona/pmm-server:latest
+    state: started
+    volumes_from:
+    - pmm-data
+    env: "{{ __pmm_server_env }}"
+    ports:
+    - "{{ pmm_server_http_port }}:80"
+    restart_policy: always
