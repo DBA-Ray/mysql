@@ -1,37 +1,37 @@
 ---
 # tasks file for mysql_ray
 - include: password.yml
-  when: not is_update
+  when: not is_update | default(False)
 
 - include: system_check.yml
-  when: not is_update
+  when: not is_update | default(False)
 
 - include: initial_start.yml
-  when: is_standalone
+  when: is_standalone | default(False)
 
 - include: initial_group_replication.yml
-  when: is_standalone and mysql_group_replication
+  when: ( is_standalone | default(False) ) and ( mysql_group_replication | default(False) )
 
 - include: initial_slave_monitor.yml
-  when: is_standalone and slave_monitor_replication
+  when: ( is_standalone | default(False) ) and ( slave_monitor_replication | default(False) )
 
 - include: initial_replication.yml
-  when: is_standalone and mysql_traditional_replication
+  when: ( is_standalone | default(False) ) and ( mysql_traditional_replication | default(False) )
 
 - include: install_tools.yml
-  when: percona_tools
+  when: percona_tools | default(False)
 
 - include: auto_xtrabackup.yml
-  when: auto_xtrabackup
+  when: auto_xtrabackup | default(False)
 
 - include: auto_monitor.yml
-  when: auto_monitor
+  when: auto_monitor | default(False)
 
-- inclued: auto_pmm_send_logs.yml
-  when: auto_pmm_seng_logs
+- include: auto_pmm_send_logs.yml
+  when: auto_pmm_seng_logs | default(False)
 
 - include: auto_config_pmm.yml
-  when: auto_config_pmm
+  when: auto_config_pmm | default(False)
 
 - include: upgrade.yml
-  when: is_update
+  when: is_update | default(False)

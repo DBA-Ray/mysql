@@ -12,75 +12,75 @@
       run_once: True
 
 - hosts: mgr
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_standalone: True # Whether to install stand-alone version
-    mysql_group_replication: True # Whether to enable group replication
+    is_standalone: False # Whether to install stand-alone version
+    mysql_group_replication: False # Whether to enable group replication
   roles:
     - dba_ray.mysql
 
 - hosts: slave_monitor
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_standalone: True # Whether to install stand-alone version
-    mysql_group_replication: True # Whether to enable group replication
-    slave_monitor_replication: True # Whether to enable semi-synchronous replication instances for MGR
+    is_standalone: False # Whether to install stand-alone version
+    mysql_group_replication: False # Whether to enable group replication
+    slave_monitor_replication: False # Whether to enable semi-synchronous replication instances for MGR
   roles:
     - dba_ray.mysql
 
 - hosts: mysql
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_standalone: True # Whether to install stand-alone version
-    mysql_traditional_replication: True # Whether to enable semi-synchronous replication
+    is_standalone: False # Whether to install stand-alone version
+    mysql_traditional_replication: False # Whether to enable semi-synchronous replication
   roles:
     - dba_ray.mysql
 
 - hosts: all:!ansible
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    percona_tools: True # Whether to install percona tools
-    auto_config_pmm: True # Whether to config pmm client to pmm server
+    percona_tools: False # Whether to install percona tools
+    auto_config_pmm: False # Whether to config pmm client to pmm server
   roles:
     - dba_ray.mysql
 
 - hosts: slave_monitor:mysql[1:2]
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    auto_xtrabackup: True # Whether to deploy auto backup scripts via xtrabackup
-    auto_monitor: True # Whether to deploy auto monitor scripts via shell
+    auto_xtrabackup: False # Whether to deploy auto backup scripts via xtrabackup
+    auto_monitor: False # Whether to deploy auto monitor scripts via shell
   roles:
     - dba_ray.mysql
 
 - hosts: ansible
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   vars:
-    auto_pmm_seng_logs: True # Whether to deploy pmm and send logs scripts via shell
+    auto_pmm_seng_logs: False # Whether to deploy pmm and send logs scripts via shell
   roles:
     - dba_ray.mysql
 
 - hosts: mgr:slave_monitor:mysql
-  gather_facts: True
+  gather_facts: False
   remote_user: root
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_update: True # Whether to upgrade mysql server
+    is_update: False # Whether to upgrade mysql server
   roles:
     - dba_ray.mysql

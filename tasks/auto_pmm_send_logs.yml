@@ -24,8 +24,21 @@
     hour: "09"
     job: "{{ shelldir }}/mysql_slow_collect_send.sh > /dev/null"
 
+- name: Install pip
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - epel-release
+    - python-pip
+
+- name: Upgrade pip
+  pip:
+    name: pip
+    state: latest
+
 - name: Install docker
-  yum:
+  pip:
     name: docker
     state: latest
 
@@ -36,11 +49,11 @@
     enabled: yes
 
 - name: Copy docker directory to installdir
-  copy: src=/var/lib/docker dest={{ installdir }}/ remote_src=yes
+  copy: src=/var/lib/docker dest={{ install_dir }}/ remote_src=yes
 
 - name: Create a symbolic link
   file:
-    src: {{ installdir }}/docker
+    src: "{{ install_dir }}/docker"
     dest: /var/lib/docker
     owner: root
     group: root
