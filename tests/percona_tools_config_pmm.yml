@@ -1,0 +1,23 @@
+---
+- hosts: all
+  gather_facts: True
+  remote_user: root
+  tasks:
+    - name: Add IP address,hostname of all hosts to all hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item]['ansible_eth0']['ipv4']['address'] }} {{ hostvars[item]['inventory_hostname_short'] }}"
+        state: present
+      with_items: "{{ groups.all }}"
+      run_once: True
+
+- hosts: all:!ansible
+  gather_facts: True
+  remote_user: root
+  serial: 1
+  max_fail_percentage: 20
+  vars:
+    percona_tools: True # Whether to install percona tools
+    auto_config_pmm: True # Whether to config pmm client to pmm server
+  roles:
+    - dba_ray.mysql

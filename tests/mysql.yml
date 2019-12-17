@@ -1,0 +1,34 @@
+---
+- hosts: all
+  gather_facts: True
+  remote_user: root
+  tasks:
+    - name: Add IP address,hostname of all hosts to all hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item]['ansible_eth0']['ipv4']['address'] }} {{ hostvars[item]['inventory_hostname_short'] }}"
+        state: present
+      with_items: "{{ groups.all }}"
+      run_once: True
+
+- hosts: mysql
+  gather_facts: True
+  remote_user: root
+  serial: 1
+  max_fail_percentage: 20
+  vars:
+    is_standalone: True # Whether to install stand-alone version
+    mysql_traditional_replication: True # Whether to enable semi-synchronous replication
+  roles:
+    - dba_ray.mysql
+
+- hosts: mysql[1:2]
+  gather_facts: True
+  remote_user: root
+  serial: 1
+  max_fail_percentage: 20
+  vars:
+    auto_xtrabackup: True # Whether to deploy auto backup scripts via xtrabackup
+    auto_monitor: True # Whether to deploy auto monitor scripts via shell
+  roles:
+    - dba_ray.mysql

@@ -13,7 +13,7 @@
   when: is_standalone and mysql_group_replication
 
 - include: initial_slave_monitor.yml
-  when: is_standalone and mysql_group_replication and slave_monitor_replication
+  when: is_standalone and slave_monitor_replication
 
 - include: initial_replication.yml
   when: is_standalone and mysql_traditional_replication

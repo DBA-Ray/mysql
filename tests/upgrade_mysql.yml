@@ -1,0 +1,10 @@
+---
+- hosts: mgr:slave_monitor:mysql
+  gather_facts: True
+  remote_user: root
+  serial: 1
+  max_fail_percentage: 20
+  vars:
+    is_update: True # Whether to upgrade mysql server
+  roles:
+    - dba_ray.mysql

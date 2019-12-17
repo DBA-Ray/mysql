@@ -1,0 +1,20 @@
+---
+- hosts: all
+  gather_facts: True
+  remote_user: root
+  tasks:
+    - name: Add IP address,hostname of all hosts to all hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item]['ansible_eth0']['ipv4']['address'] }} {{ hostvars[item]['inventory_hostname_short'] }}"
+        state: present
+      with_items: "{{ groups.all }}"
+      run_once: True
+
+- hosts: ansible
+  gather_facts: True
+  remote_user: root
+  vars:
+    auto_pmm_seng_logs: True # Whether to deploy pmm and send logs scripts via shell
+  roles:
+    - dba_ray.mysql
