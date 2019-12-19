@@ -10,7 +10,16 @@
     master_user: repl
     master_password: "{{ mysql_monitor_password }}"
     master_auto_position: yes
-  when: mysql_replication and ansible_hostname == "slave_monitor1"
+  when: ansible_hostname == "slave_monitor1"
+
+- name: Start slave status for slaves
+  mysql_replication:
+    login_port: "{{ login_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    mode: startslave
+  when: ansible_hostname == "slave_monitor1"
 
 - name: Config replication for mgr3
   mysql_replication:
@@ -24,4 +33,13 @@
     master_user: repl
     master_password: "{{ mysql_monitor_password }}"
     master_auto_position: yes
-  when: mysql_replication and ansible_hostname == "slave_monitor2"
+  when: ansible_hostname == "slave_monitor2"
+
+- name: Start slave status for slaves
+  mysql_replication:
+    login_port: "{{ login_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    mode: startslave
+  when: ansible_hostname == "slave_monitor2"
