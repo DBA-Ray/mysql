@@ -89,19 +89,19 @@ echo ${LAST_ERROR_MESSAGE}
 
 fi
 
-if [ -z $1 ] ; then
-        echo -e "MGR is not configured or you do not have the required access to MySQL on server "$3"!"|mail -v -s "$3" rulei@jjl.cn
-        SendMessageToDingding "MGR is not configured or you do not have \nthe required access to MySQL on server "$3"!"   
+if [ -z ${member_state} ] ; then
+        echo -e "MGR is not configured or you do not have the required access to MySQL on server "$1"!"|mail -v -s "$1" rulei@jjl.cn
+        SendMessageToDingding "MGR is not configured or you do not have \nthe required access to MySQL on server "$1"!"   
 fi        
 
-if [ "$1" != "ONLINE" ] ; then
-        echo -e "Please be aware that member_state is \"$1\" with group replication on server "$3"! Last Error Message:"${LAST_ERROR_MESSAGE}""|mail -v -s "$3" rulei@jjl.cn
-        SendMessageToDingding "Please be aware that member_state is $1 with group replication on server "$3"! Last Error Message:"${LAST_ERROR_MESSAGE}""  
+if [ "${member_state}" != "ONLINE" ] ; then
+        echo -e "Please be aware that member_state is \"${member_state}\" with group replication on server "$1"! Last Error Message:"${LAST_ERROR_MESSAGE}""|mail -v -s "$1" rulei@jjl.cn
+        SendMessageToDingding "Please be aware that member_state is ${member_state} with group replication on server "$1"! Last Error Message:"${LAST_ERROR_MESSAGE}""  
 fi
 
-if [ $2 == 'ON' ] ; then
-        echo -e "Please be aware that the super_read_only is \"ON\" with group replication on server "$3"! Last Error Message:"${LAST_ERROR_MESSAGE}""|mail -v -s "$3" rulei@jjl.cn     
-       SendMessageToDingding "Please be aware that the super_read_only is ON \nwith group replication on server "$3"! Last Error Message:"${LAST_ERROR_MESSAGE}""
+if [ ${VARIABLE_READ} == 'ON' ] ; then
+        echo -e "Please be aware that the super_read_only is \"ON\" with group replication on server "$1"! Last Error Message:"${LAST_ERROR_MESSAGE}""|mail -v -s "$1" rulei@jjl.cn     
+       SendMessageToDingding "Please be aware that the super_read_only is ON \nwith group replication on server "$1"! Last Error Message:"${LAST_ERROR_MESSAGE}""
 fi
 
 }
@@ -125,7 +125,7 @@ do
 
  mgr_status member_state VARIABLE_READ LAST_ERROR_MESSAGE ${ip} repl ${monitor_passwd} 3377
 
- mgr_status_alert ${member_state} ${VARIABLE_READ} Alert_${hostname}_pro
+ mgr_status_alert Alert_${hostname}_pro
 
  performance_status count_transactions_in_queue ${ip} repl ${monitor_passwd} 3377
 
