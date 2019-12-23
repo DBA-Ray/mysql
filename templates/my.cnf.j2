@@ -56,7 +56,7 @@
   loose-group_replication_group_name = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" #组的名字可以随便起,但不能用主机的GTID（为mgr高可用组起一个名字，这个名字一定要是uuid格式的，所有节点一致）
   loose-group_replication_start_on_boot = off #启动后自动启动组复制。
   loose-group_replication_bootstrap_group = off #为了避免每次启动自动引导具有相同名称的第二个组,所以设置为OFF。
-  loose-group_replication_local_address = "{{ ansible_eth0['ipv4']['address'] }}:33771" #写自己主机所在IP（mgr各实例之前都是要进行通信的，这个配置项设置的就是本实例所监听的ip：端口，不是MySQL对外提供服务的端口）
+  loose-group_replication_local_address = "{{ ansible_default_ipv4.address }}:33771" #写自己主机所在IP（mgr各实例之前都是要进行通信的，这个配置项设置的就是本实例所监听的ip：端口，不是MySQL对外提供服务的端口）
   loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771" #各mgr实例所监听的ip:端口，所有节点一致
   loose-group_replication_single_primary_mode = {{ single_primary }} #单主模式的参数
   loose-group_replication_enforce_update_everywhere_checks = {{ mutli_primary }} #多主模式的参数
