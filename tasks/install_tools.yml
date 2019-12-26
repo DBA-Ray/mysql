@@ -1,9 +1,14 @@
-- name: Copy the percona-release package
-  copy: src=percona-release-0.1-6.noarch.rpm dest={{ package_dir }}
+- name: Copy the percona-release package and mydumper package
+  copy:  
+    src: "{{ item }}"  
+    dest: "{{ package_dir }}"
+  with_items: 
+    - percona-release-0.1-6.noarch.rpm
+    - mydumper-0.9.5-2.el7.x86_64.rpm 
 
-- name: Install the percona-release package
+- name: Install the percona-release package and mydumper package
   yum:
-    name: "{{ package_dir }}/percona-release-0.1-6.noarch.rpm"
+    name: ["{{ package_dir }}/percona-release-0.1-6.noarch.rpm", "{{ package_dir }}/mydumper-0.9.5-2.el7.x86_64.rpm"]
     state: present
 
 - name: Copy the percona-release.repo
