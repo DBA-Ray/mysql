@@ -51,6 +51,9 @@
   notify: Source profile
   register: source
 
+- name: Source profile
+  shell: source /etc/profile
+
 - name: Rendering mysql parameter file
   template:
     src: "{{ item.src }}"

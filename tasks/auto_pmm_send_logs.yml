@@ -26,11 +26,8 @@
 
 - name: Install pip
   yum: 
-    name: "{{ item }}"
+    name: ['epel-release', 'python-pip']
     state: latest
-  with_items:
-    - epel-release
-    - python-pip
 
 - name: Upgrade pip
   pip:

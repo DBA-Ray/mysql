@@ -1,8 +1,5 @@
 ---
 # defaults file for proxysql_ray
-# Single-primary or primary
-mutli_primary: False
-single_primary: True
 # Whether to enable analysis slow log
 mysql_slow_digest: True
 # Archived base path
@@ -19,7 +16,7 @@ mysql_upgrade_package: mysql-8.0.18-el7-x86_64.tar.gz
 mysql_upgrade_version: mysql-8.0.18-el7-x86_64
 mysql_version: mysql-8.0.18-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-install_dir: /var/local
+install_dir: /data
 package_dir: "{{ install_dir }}/package"
 basedir: "{{ install_dir }}/mysql"
 shelldir: "{{ install_dir }}/shell"

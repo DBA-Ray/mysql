@@ -12,7 +12,7 @@
     master_auto_position: yes
   when: ansible_hostname != "master"
 
-  - name: Start slave status for slaves
+- name: Start slave status for slaves
   mysql_replication:
     login_port: "{{ login_port }}"
     login_user: root

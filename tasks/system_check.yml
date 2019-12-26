@@ -14,10 +14,10 @@
     name: mariadb
     state: absent
 
-#- name: 安装基础软件包
-#  yum:
-#    name: "{{ packages }}"
-#    state: latest
+- name: 安装基础软件包
+  yum:
+    name: "{{ packages }}"
+    state: latest
 
 - hostname:
     name: "{{ ansible_hostname }}"

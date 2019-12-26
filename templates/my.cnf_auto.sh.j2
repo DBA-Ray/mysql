@@ -64,7 +64,7 @@ sed -i 's|group_replication_ip_whitelist = 1|group_replication_ip_whitelist = '"
 
 echo $user_whitelist > /tmp/user_whitelist.txt
 
-if [ {{ mutli_primary }} == True -a {{ mysql_traditional_replication }} == False ]
+if [ {{ mutli_primary }} == True ]
 
 then
 
