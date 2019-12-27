@@ -17,4 +17,4 @@
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"
-    login_unix_socket: /tmp/mysql.sock
+    login_unix_socket: "{{ socket }}"
