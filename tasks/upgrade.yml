@@ -21,6 +21,9 @@
     dest: "{{ basedir }}"
     remote_src: yes
 
+- name: Wait for replication to complete
+  pause: seconds=7
+
 - name: 启动mysql服务
   systemd:
     name: mysqld
