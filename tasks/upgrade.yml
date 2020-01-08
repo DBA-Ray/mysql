@@ -1,8 +1,3 @@
-- name: 停止mysql服务
-  systemd:
-    name: mysqld
-    state: stopped
-
 - name: Copy the latest mysql
   copy: 
     src: "{{ mysql_upgrade_package }}"
@@ -15,13 +10,18 @@
     remote_src: yes
   run_once: True
 
+- name: 停止mysql服务
+  systemd:
+    name: mysqld
+    state: stopped
+
 - name: 复制mysql二进制包
   copy:
     src: "{{ package_dir }}/{{ mysql_upgrade_version }}/"
     dest: "{{ basedir }}"
     remote_src: yes
 
-- name: 启动mysql服务   
+- name: 启动mysql服务
   systemd:
     name: mysqld
     state: started
