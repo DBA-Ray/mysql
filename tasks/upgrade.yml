@@ -18,11 +18,11 @@
 - name: 复制mysql二进制包
   copy:
     src: "{{ package_dir }}/{{ mysql_upgrade_version }}/"
-    dest: "{{ basedir }}"
+    dest: "{{ basedir }}/"
     remote_src: yes
 
-- name: Wait for replication to complete
-  pause: seconds=7
+- name: Copy the upgrade package
+  shell: "cp -rf {{ package_dir }}/{{ mysql_upgrade_version }}/* {{ basedir }}/"
 
 - name: 启动mysql服务
   systemd:
