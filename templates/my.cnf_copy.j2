@@ -93,16 +93,16 @@
   skip-external-locking
 
 # innodb 优化
-  innodb_buffer_pool_size = 25G
-  innodb_log_file_size = 256M #mysqladmin extended -uroot -pxxxxxxxx -r -i 60 -c 3 |grep "innodb_os_log_written" 
+  innodb_buffer_pool_size = {{ ansible_memtotal_mb // 1024 * 7 // 10 | int }}G
+  innodb_log_file_size = 256M #mysqladmin extended -uroot -pxxxxxxxx -r -i 60 -c 3 |grep "innodb_os_log_written"
   innodb_flush_method=O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选
   innodb_open_files = 10000
   innodb_io_capacity = 5000
   innodb_io_capacity_max = 50000
   innodb_log_compressed_pages = OFF #固态硬盘可以关闭
-  innodb_read_io_threads = 4
-  innodb_write_io_threads = 4
-  innodb_thread_concurrency = 10 #将其设置为处理器数目加磁盘数之和，对于高并发事务，可以再大些
+  innodb_read_io_threads = {{ ansible_processor_cores * ansible_processor_count * 7 // 10 + 1 | int }}
+  innodb_write_io_threads = {{ ansible_processor_cores * ansible_processor_count * 3 // 10 + 1 | int }}
+  innodb_thread_concurrency = {{ ansible_processor_cores * ansible_processor_count * 2 | int }} #将其设置为处理器数目加磁盘数之和，对于高并发事务，可以再大些
   innodb_monitor_enable = all
 
 # 临时表优化
