@@ -1,7 +1,12 @@
 - name: Create a directory for monitor
-  file: >
-        path={{ monitordir }} state=directory owner=mysql group=mysql
-        path={{ shelldir }} state=directory owner=mysql group=mysql
+  file:
+    state: directory
+    owner: mysql
+    group: mysql
+    path: "{{ item }}"
+  with_items:
+    - "{{ monitordir }}"
+    - "{{ shelldir }}"
 
 - name: Rendering monitor script file
   template:
@@ -12,7 +17,7 @@
     mode: 0744
   with_items:
     - { src: 'alert_mgr_status.sh.j2', dest: '{{ shelldir }}/alert_mgr_status.sh' }
-    - { src: 'alert_slave_status.sh.j2', dest: '{{ shelldir }}"/alert_slave_status.sh' }
+    - { src: 'alert_slave_status.sh.j2', dest: '{{ shelldir }}/alert_slave_status.sh' }
 
 - name: Add automatic monitor mgr&slave schedule for slave_monitor1
   cron:
