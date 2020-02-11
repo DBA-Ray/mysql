@@ -26,15 +26,15 @@ innodb_buffer_pool=`expr $mem \* $a / $b`
 
 #自动赋值server_id,取IP最后一位
 
-server_id=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $4}'`
+server_id=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'`
 
-d=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $1}'`
+d=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $1}'`
 
-e=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $2}'`
+e=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $2}'`
 
-g=`echo {{ ansible_eth0['ipv4']['address'] }} | awk -F'.' '{print $3}'`
+g=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $3}'`
 
-f=`ip a|grep {{ ansible_eth0['ipv4']['address'] }}|awk '{print $2}'|tr -d "addr:"|sed 's/.*\(..\)$/\1/'`
+f=`ip a|grep {{ ansible_default_ipv4['address'] }}|awk '{print $2}'|tr -d "addr:"|sed 's/.*\(..\)$/\1/'`
 
 whitelist=`echo "$d.$e.$g.0/$f"`
 
