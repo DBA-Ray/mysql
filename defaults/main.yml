@@ -12,8 +12,8 @@ pmm_server_http_port: 7070
 # ansible host IP
 ansible_local_host: 10.0.64.43
 # Directory path
-mysql_upgrade_package: mysql-8.0.18-el7-x86_64.tar.gz
 mysql_upgrade_version: mysql-8.0.18-el7-x86_64
+mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.18-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 install_dir: /data
