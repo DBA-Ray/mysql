@@ -1,31 +1,5 @@
-- name: Rendering mysql_slow_collect_send.sh script file
-  template:
-    src: mysql_slow_collect_send.sh.j2
-    dest: "{{ shelldir }}/mysql_slow_collect_send.sh"
-    owner: root
-    group: root
-    mode: 0744
-
-- name: Copy the mail body file and example file
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - { src: 'main_body.txt', dest: "{{ monitordir }}/main_body.txt" }
-    - { src: 'slow_digest_example.docx', dest: "{{ monitordir }}/slow_digest_example.docx" }
-
-- name: ADD automatically collect slow logs and send them to DBA via email
-  cron:
-    name: "automatically collect slow logs and send them to DBA via email"
-    minute: "10"
-    hour: "09"
-    job: "{{ shelldir }}/mysql_slow_collect_send.sh > /dev/null"
-
 - name: Install pip
-  yum: 
+  yum:
     name: ['epel-release', 'python-pip']
     state: latest
 

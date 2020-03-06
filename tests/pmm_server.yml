@@ -15,6 +15,6 @@
   gather_facts: True
   remote_user: root
   vars:
-    auto_pmm_seng_logs: True # Whether to deploy pmm and send logs scripts via shell
+    auto_pmm: True # Whether to deploy pmm and send logs scripts via shell
   roles:
     - dba_ray.mysql

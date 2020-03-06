@@ -24,11 +24,8 @@
 - include: auto_xtrabackup.yml
   when: auto_xtrabackup | default(False)
 
-- include: auto_monitor.yml
-  when: auto_monitor | default(False)
-
-- include: auto_pmm_send_logs.yml
-  when: auto_pmm_seng_logs | default(False)
+- include: auto_pmm.yml
+  when: auto_pmm | default(False)
 
 - include: auto_config_pmm.yml
   when: auto_config_pmm | default(False)
