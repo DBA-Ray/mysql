@@ -21,9 +21,6 @@
 - include: install_tools.yml
   when: percona_tools | default(False)
 
-- include: auto_xtrabackup.yml
-  when: auto_xtrabackup | default(False)
-
 - include: auto_pmm.yml
   when: auto_pmm | default(False)
 
