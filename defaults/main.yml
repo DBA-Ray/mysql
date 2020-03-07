@@ -1,11 +1,4 @@
 ---
-# defaults file for proxysql_ray
-# Whether to enable analysis slow log
-mysql_slow_digest: True
-# Archived base path
-xtrabackup_full: "{{ ansible_hostname }}_xxx_full"
-# Define recipients for send mail
-recipient: rulei@jjl.cn
 # Set custom env for pmm additional options
 pmm_server_env_custom: {}
 pmm_server_http_port: 7070
@@ -27,5 +20,5 @@ logdir: "{{ basedir }}/log"
 socket: /tmp/mysql.sock
 # Basic parameters
 mysql_port: 3377
-max_connections: 10000
-timeout: 28800
+max_connections: 1000
+timeout: 100

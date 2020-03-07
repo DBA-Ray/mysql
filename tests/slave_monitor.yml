@@ -17,7 +17,7 @@
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_standalone: True # Whether to install stand-alone version
-    slave_monitor_replication: True # Whether to enable semi-synchronous replication instances for MGR
+    is_standalone: False # Whether to install stand-alone version
+    slave_monitor_replication: False # Whether to enable semi-synchronous replication instances for MGR
   roles:
     - dba_ray.mysql

@@ -46,7 +46,7 @@
     - /opt/consul-data
     - /var/lib/mysql
     - /var/lib/grafana
-    command: /bin/true 
+    command: /bin/true
 
 - name: Running PMM Data Container secured with pmm_server_username and pmm_server_password
   docker_container:

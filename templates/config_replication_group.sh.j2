@@ -24,6 +24,7 @@ mysql -uroot -p${1} -S /tmp/mysql.sock < /tmp/mgr_monitor.sql
 
 else
 
-mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
+mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl', \
+MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
 
 fi

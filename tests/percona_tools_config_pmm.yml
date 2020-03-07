@@ -17,7 +17,7 @@
   serial: 1
   max_fail_percentage: 20
   vars:
-    percona_tools: True # Whether to install percona tools
-    auto_config_pmm: True # Whether to config pmm client to pmm server
+    percona_tools: False # Whether to install percona tools
+    auto_config_pmm: False # Whether to config pmm client to pmm server
   roles:
     - dba_ray.mysql

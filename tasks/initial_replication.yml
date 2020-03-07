@@ -20,20 +20,3 @@
     login_unix_socket: "{{ socket }}"
     mode: startslave
   when: ansible_hostname != "master"
-
-- name: Rendering mysql_slow_digest.sh.j2
-  template:
-    src: mysql_slow_digest.sh.j2
-    dest: "{{ shelldir }}/mysql_slow_digest.sh"
-    owner: root
-    group: root
-    mode: 0744
-  when: mysql_slow_digest
-
-- name: Add a job to monitor slow logs
-  cron:
-    name: "monitor slowlog"
-    minute: "00"
-    hour: "09"
-    job: "{{ shelldir }}/mysql_slow_digest.sh > /dev/null"
-  when: mysql_slow_digest

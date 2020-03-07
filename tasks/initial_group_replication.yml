@@ -17,21 +17,4 @@
   when: ansible_hostname == "mgr1"
 
 - name: Config group_replication_bootstrap_group
-  shell: sh -x "{{ shelldir }}/config_replication_group.sh" "{{ root_password }}" "{{ mysql_monitor_password }}"
-
-- name: Rendering mysql_slow_digest.sh.j2
-  template:
-    src: mysql_slow_digest.sh.j2
-    dest: "{{ shelldir }}/mysql_slow_digest.sh"
-    owner: root
-    group: root
-    mode: 0744
-  when: mysql_slow_digest
-
-- name: Add a job to monitor slow logs
-  cron:
-    name: "monitor slowlog"
-    minute: "00"
-    hour: "09"
-    job: "{{ shelldir }}/mysql_slow_digest.sh > /dev/null"
-  when: mysql_slow_digest
+  shell: "sh -x {{ shelldir }}/config_replication_group.sh {{ root_password }} {{ mysql_monitor_password }}"

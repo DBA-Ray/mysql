@@ -36,5 +36,4 @@
   with_items:
     - pmm-admin add proxysql:metrics --dsn "stats:stats@tcp(localhost:6032)/"
     - pmm-admin add linux:metrics
-  when: ansible_hostname = "proxysql1" or
-        ansible_hostname = "proxysql2"
+  when: ansible_hostname in groups.proxysql

@@ -82,19 +82,19 @@
 
 # 连接数优化
   max_connections = {{ max_connections }}
-  max_connect_errors = 1000000
+  max_connect_errors = 100000
   max_allowed_packet = 1072693248 #必须小于slave_max_allowed_packet的默认值1073741824（1G）
 
 # table缓存优化（建议10倍于max_connections）
-  table_open_cache = 100000
-  table_definition_cache = 100000
+  table_open_cache = 10000
+  table_definition_cache = 10000
 
 # 避免MySQL的外部锁定，减少出错几率增强稳定性。
   skip-external-locking
 
 # innodb 优化
   innodb_buffer_pool_size = 25G
-  innodb_log_file_size = 256M #mysqladmin extended -uroot -pxxxxxxxx -r -i 60 -c 3 |grep "innodb_os_log_written" 
+  innodb_log_file_size = 256M #mysqladmin extended -uroot -pxxxxxxxx -r -i 60 -c 3 |grep "innodb_os_log_written"
   innodb_flush_method=O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选
   innodb_open_files = 10000
   innodb_io_capacity = 5000

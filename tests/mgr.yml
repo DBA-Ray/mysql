@@ -17,7 +17,7 @@
   serial: 1
   max_fail_percentage: 20
   vars:
-    is_standalone: True # Whether to install stand-alone version
+    is_standalone: False # Whether to install stand-alone version
     mysql_group_replication: False # Whether to enable group replication
     # Single-primary or primary
     mutli_primary: False
