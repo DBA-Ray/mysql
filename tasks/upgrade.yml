@@ -1,5 +1,5 @@
 - name: Copy the latest mysql
-  copy: 
+  copy:
     src: "{{ mysql_upgrade_package }}"
     dest: "{{ package_dir }}"
 

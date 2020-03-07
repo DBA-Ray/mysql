@@ -7,9 +7,6 @@
 - name: Wait for MySQL is running
   pause: seconds=3
 
-- name: Source profile
-  shell: source /etc/profile
-
 - name: Set default_collation_for_utf8mb4 variable to utf8mb4_general_ci
   mysql_variables:
     variable: default_collation_for_utf8mb4

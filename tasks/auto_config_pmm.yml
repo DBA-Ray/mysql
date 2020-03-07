@@ -15,14 +15,10 @@
         ansible_hostname == "master"
 
 - name: Config pmm server via pmm-admin
-  shell: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password {{pmm_password}}"
-  args:
-    executable: /bin/bash
+  shell: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password {{ pmm_password }}"
 
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
-  shell: "pmm-admin add mysql --user pmm --password {{pmm_password}}"
-  args:
-    executable: /bin/bash
+  shell: "pmm-admin add mysql --user pmm --password {{ pmm_password }}"
   loop:
     - "{{ hostvars[groups['mgr']]['inventory_hostname'] }}"
     - "{{ hostvars[groups['slave_monitor']]['inventory_hostname'] }}"
@@ -31,8 +27,6 @@
 
 - name: Add proxysql via pmm-admin for proxysql group
   shell: "{{ item }}"
-  args:
-    executable: /bin/bash
   with_items:
     - pmm-admin add proxysql:metrics --dsn "stats:stats@tcp(localhost:6032)/"
     - pmm-admin add linux:metrics

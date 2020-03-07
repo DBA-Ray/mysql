@@ -44,11 +44,9 @@
     line: export PATH={{ basedir }}/bin:$PATH
     insertafter: EOF
     state: present
-  notify: Source profile
-  register: source
 
 - name: Source profile
-  shell: source /etc/profile
+  shell: "source /etc/profile"
 
 - name: Rendering mysql parameter file
   template:
@@ -74,10 +72,10 @@
     - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log.sh" }
 
 - name: Auto config my.cnf
-  shell: sh -x "{{ etcdir }}/my.cnf_auto.sh"
+  shell: "sh -x {{ etcdir }}/my.cnf_auto.sh"
 
 - name: Obtain user_whitelist
-  shell: cat /tmp/user_whitelist.txt
+  shell: "cat /tmp/user_whitelist.txt"
   register: user_whitelist
 
 - name: Initial mysql server
