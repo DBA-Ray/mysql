@@ -41,7 +41,7 @@ galaxy_info:
   #   - 99.99
 
   galaxy_tags:
-    - mysql
+  # - mysql
     - mgr
     - replication
     # List tags for your role here, one per line. A tag is a keyword  that describes
