@@ -10,7 +10,7 @@ then
 
 fi
 
-if [ "{{ ansible_hostname }}" == "mgr1" ]
+if [ "{{ ansible_hostname }}" == "{{ primary_hostname }}" ]
 
 then
 

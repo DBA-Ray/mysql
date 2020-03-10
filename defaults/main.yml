@@ -5,9 +5,9 @@ pmm_server_http_port: 7070
 # ansible host IP
 ansible_local_host: 10.0.64.43
 # Directory path
-mysql_upgrade_version: mysql-8.0.18-el7-x86_64
+mysql_upgrade_version: mysql-8.0.19-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.18-el7-x86_64
+mysql_version: mysql-8.0.19-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 install_dir: /data
 package_dir: "{{ install_dir }}/package"
@@ -22,3 +22,6 @@ socket: /tmp/mysql.sock
 mysql_port: 3377
 max_connections: 1000
 timeout: 100
+tmp_size: 1G
+# primary hostname for mgr
+primary_hostname: mgr1

@@ -106,9 +106,9 @@
   innodb_monitor_enable = all
 
 # 临时表优化
-  tmp_table_size = 2G
-  max_heap_table_size = 2G
-  temptable_max_ram = 2G #TempTable引擎的大小由参数temp_table_max_ram来控制，默认为1G。超过了则存储在磁盘上（ibtmp1）。
+  tmp_table_size = {{ tmp_size }}
+  max_heap_table_size = {{ tmp_size }}
+  temptable_max_ram = {{ tmp_size }} #TempTable引擎的大小由参数temp_table_max_ram来控制，默认为1G。超过了则存储在磁盘上（ibtmp1）。
 
 # 死锁记录至error_log
   innodb_print_all_deadlocks = 0

@@ -11,8 +11,7 @@
     sql_log_bin: yes
     login_unix_socket: "{{ socket }}"
     state: present
-  when: ansible_hostname == "mgr1" or
-        ansible_hostname == "master"
+  when: ansible_hostname == "{{ primary_hostname }}" or ansible_hostname == "master"
 
 - name: Config pmm server via pmm-admin
   commond: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password {{ pmm_password }}"
@@ -20,7 +19,8 @@
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
   shell: "pmm-admin add mysql --user pmm --password {{ pmm_password }}"
   loop:
-    - "{{ hostvars[groups['mgr']]['inventory_hostname'] }}"
+    - "{{ hostvars[groups['mgr_pro1']]['inventory_hostname'] }}"
+    - "{{ hostvars[groups['mgr_pro2']]['inventory_hostname'] }}"
     - "{{ hostvars[groups['slave_monitor']]['inventory_hostname'] }}"
     - "{{ hostvars[groups['mysql']]['inventory_hostname'] }}"
   when: ansible_hostname in item
@@ -30,4 +30,4 @@
   with_items:
     - pmm-admin add proxysql:metrics --dsn "stats:stats@tcp(localhost:6032)/"
     - pmm-admin add linux:metrics
-  when: ansible_hostname in groups.proxysql
+  when: ansible_hostname in groups.proxysql_pro1 or ansible_hostname in groups.proxysql_pro2

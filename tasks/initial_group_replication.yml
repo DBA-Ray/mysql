@@ -14,7 +14,7 @@
 
 - name: Copy the mgr_monitor.sql
   copy: src=mgr_monitor.sql dest=/tmp
-  when: ansible_hostname == "mgr1"
+  when: ansible_hostname == "{{ primary_hostname }}"
 
 - name: Config group_replication_bootstrap_group
   shell: "sh -x {{ shelldir }}/config_replication_group.sh {{ root_password }} {{ mysql_monitor_password }}"

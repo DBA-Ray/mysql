@@ -11,7 +11,7 @@
       with_items: "{{ groups.all }}"
       run_once: True
 
-- hosts: all:!ansible
+- hosts: all:!localhost
   gather_facts: True
   remote_user: root
   serial: 1

@@ -11,7 +11,7 @@
       with_items: "{{ groups.all }}"
       run_once: True
 
-- hosts: mgr
+- hosts: mgr_pro1
   gather_facts: True
   remote_user: root
   serial: 1
