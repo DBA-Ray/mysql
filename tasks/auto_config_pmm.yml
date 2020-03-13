@@ -14,10 +14,10 @@
   when: ansible_hostname == "{{ primary_hostname }}" or ansible_hostname == "master"
 
 - name: Config pmm server via pmm-admin
-  command: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password {{ pmm_password }}"
+  command: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password '{{ mysql_monitor_password }}'"
 
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
-  shell: "pmm-admin add mysql --user pmm --password {{ pmm_password }}"
+  shell: "pmm-admin add mysql --user pmm --password '{{ mysql_monitor_password }}'"
   loop:
     - "{{ hostvars[groups['mgr_pro1']]['inventory_hostname'] }}"
     - "{{ hostvars[groups['mgr_pro2']]['inventory_hostname'] }}"

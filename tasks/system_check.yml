@@ -19,9 +19,18 @@
     name: "{{ packages }}"
     state: latest
 
-- name: Config hostname
-  hostname:
-    name: "{{ ansible_hostname }}"
+- name: Stop mysql server
+  systemd:
+    name: mysqld
+    state: stopped
+  when: whether_uninstall
+
+- name: Remove existing mysql directory
+  file:
+    path: "{{ datadir }}"
+    state: absent
+    remote_src: 'True'
+  when: whether_uninstall
 
 #- name: 更新所有软件包
 #  yum:

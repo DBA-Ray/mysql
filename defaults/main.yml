@@ -1,15 +1,17 @@
 ---
+# Whether to uninstall the original service and then install it
+whether_uninstall: True
+# Which hosts to deploy
+deploy_hosts: mgr_pro2
 # Set custom env for pmm additional options
 pmm_server_env_custom: {}
 pmm_server_http_port: 7070
-# ansible host IP
-ansible_local_host: 10.0.64.43
 # Directory path
 mysql_upgrade_version: mysql-8.0.19-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.19-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-install_dir: /data
+install_dir: /var/local
 package_dir: "{{ install_dir }}/package"
 basedir: "{{ install_dir }}/mysql"
 shelldir: "{{ install_dir }}/shell"
@@ -24,4 +26,4 @@ max_connections: 1000
 timeout: 100
 tmp_size: 1G
 # primary hostname for mgr
-primary_hostname: mgr1
+primary_hostname: mgr4

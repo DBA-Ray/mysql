@@ -40,7 +40,7 @@ whitelist=`echo "$d.$e.$g.0/$f"`
 
 user_whitelist=`echo "$d.$e.$g.%"`
 
-group_replication_group_seeds=`cat /etc/hosts|grep proxysql|awk '{print $1}'|awk '{print $0":33771"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
+group_replication_group_seeds=`cat /etc/hosts|grep mgr|awk '{print $1}'|awk '{print $0":33771"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
 
 incre_offset_tmp=`cat /etc/hostname`
 

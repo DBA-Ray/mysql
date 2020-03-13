@@ -23,14 +23,12 @@
   copy:
     src: "{{ package_name }}"
     dest: "{{ package_dir }}"
-  run_once: True
 
 - name: 解压安装包
   unarchive:
     src: "{{ package_dir }}/{{ package_name }}"
     dest: "{{ package_dir }}"
     remote_src: yes
-  run_once: True
 
 - name: 复制mysql二进制包
   copy:
@@ -135,6 +133,7 @@
     - { original: 'rpl_semi_sync_slave_enabled', change: '1' }
     - { original: 'rpl_semi_sync_master_enabled', change: '1' }
     - { original: 'rpl_semi_sync_master_timeout', change: '1000' }
+    - { original: 'clone_enable_compression', change: '1' }
 
 - name: Modify semisync parameter in my.cnf
   replace:
@@ -145,3 +144,4 @@
     - { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
     - { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
     - { original: '#rpl_semi_sync_master_timeout = 1000', change: 'rpl_semi_sync_master_timeout = 1000' }
+    - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }

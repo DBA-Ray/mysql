@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /etc/profile
+
 if [ $# -ne 2 ]
 
 then
@@ -14,17 +16,23 @@ if [ "{{ ansible_hostname }}" == "{{ primary_hostname }}" ]
 
 then
 
-mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE ALL; \
-                                           CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery'; \
-		                                   SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION; \
-			                               SET GLOBAL group_replication_bootstrap_group=OFF; \
-                                           GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'clone_user'@'{{ user_whitelist }}';flush privileges;"
+mysql -uroot -p${1} < /tmp/mgr_monitor.sql
 
-mysql -uroot -p${1} -S /tmp/mysql.sock < /tmp/mgr_monitor.sql
+mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;\
+CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';\
+SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION;\
+SET GLOBAL group_replication_bootstrap_group=OFF;"
+
+sleep 3
+
+mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;\
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'repl'@'{{ user_whitelist.stdout }}';flush privileges;"
 
 else
 
-mysql -uroot -p${1} -S /tmp/mysql.sock -e "STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl', \
+sleep 3
+
+mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl',\
 MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
 
 fi

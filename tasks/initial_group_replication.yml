@@ -17,4 +17,4 @@
   when: ansible_hostname == "{{ primary_hostname }}"
 
 - name: Config group_replication_bootstrap_group
-  shell: "sh -x {{ shelldir }}/config_replication_group.sh {{ root_password }} {{ mysql_monitor_password }}"
+  shell: "sh -x {{ shelldir }}/config_replication_group.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"

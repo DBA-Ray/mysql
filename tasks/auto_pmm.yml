@@ -1,15 +1,20 @@
-- name: Install pip
-  yum:
-    name: ['epel-release', 'python-pip']
-    state: latest
+#- name: Stop docker server
+#  systemd:
+#    name: docker
+#    state: stopped
 
-- name: Upgrade pip
-  pip:
-    name: pip
-    state: latest
+#- name: Uninstall docker
+#  yum:
+#    name: docker
+#    state: absent
+    
+- name: Remove docker directory
+  file:
+    path: /var/lib/docker
+    state: absent
 
 - name: Install docker
-  pip:
+  yum:
     name: docker
     state: latest
 
@@ -23,12 +28,7 @@
   copy: src=/var/lib/docker dest={{ install_dir }}/ remote_src=yes
 
 - name: Create a symbolic link
-  file:
-    src: "{{ install_dir }}/docker"
-    dest: /var/lib/docker
-    owner: root
-    group: root
-    state: link
+  shell: ln -s "{{ install_dir }}/docker" /var/lib/docker
   notify: Reload systemd
 
 - name: Start docker server
@@ -36,26 +36,26 @@
     name: docker
     state: started
 
-- name: Creating PMM Data Container
-  docker_container:
-    name: pmm-data
-    image: percona/pmm-server:latest
-    state: present
-    volumes:
-    - /opt/prometheus/data
-    - /opt/consul-data
-    - /var/lib/mysql
-    - /var/lib/grafana
-    command: /bin/true
-
-- name: Running PMM Data Container secured with pmm_server_username and pmm_server_password
-  docker_container:
-    name: pmm-server
-    image: percona/pmm-server:latest
-    state: started
-    volumes_from:
-    - pmm-data
-    env: "{{ __pmm_server_env }}"
-    ports:
-    - "{{ pmm_server_http_port }}:80"
-    restart_policy: always
+- name: Docker pull image
+  shell: "docker pull percona/pmm-server:latest"
+  
+- name: Docker create container
+  shell: > 
+        "docker create 
+         -v /opt/prometheus/data 
+         -v /opt/consul-data 
+         -v /var/lib/mysql 
+         -v /var/lib/grafana 
+         --name pmm-data 
+         percona/pmm-server:latest /bin/true"
+         
+- name: Dcoer run container
+  shell: >
+        "docker run -d -p {{ pmm_server_http_port }}:80 
+         --volumes-from pmm-data 
+         --name pmm-server 
+         -e SERVER_USER=pmm 
+         -e SERVER_PASSWORD='{{ mysql_monitor_password }}'
+         --restart always 
+         percona/pmm-server:latest"
+  

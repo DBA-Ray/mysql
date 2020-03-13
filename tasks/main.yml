@@ -1,10 +1,10 @@
 ---
 # tasks file for mysql_ray
 - include: password.yml
-  when: not is_update | default(False)
+  when: is_standalone | default(False)
 
 - include: system_check.yml
-  when: not is_update | default(False)
+  when: is_standalone | default(False)
 
 - include: initial_start.yml
   when: is_standalone | default(False)

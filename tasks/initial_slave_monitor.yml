@@ -14,7 +14,7 @@
 
 - name: Start slave status for slaves
   mysql_replication:
-    login_port: "{{ login_port }}"
+    login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
@@ -37,7 +37,7 @@
 
 - name: Start slave status for slaves
   mysql_replication:
-    login_port: "{{ login_port }}"
+    login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
