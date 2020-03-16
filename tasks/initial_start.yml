@@ -116,7 +116,7 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: "{{ user_whitelist.stdout }}"
-    priv: '*.*:REPLICATION SLAVE,SELECT'
+    priv: '*.*:REPLICATION SLAVE,SUPER,REPLICATION CLIENT,SELECT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
