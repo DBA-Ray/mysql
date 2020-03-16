@@ -121,6 +121,20 @@
     login_unix_socket: "{{ socket }}"
     state: present
 
+- name: Add pmm user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: pmm
+    password: "{{ pmm_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: localhost
+    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT,BACKUP_ADMIN/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
 - name: Set semisync parameter
   mysql_variables:
     login_user: root
