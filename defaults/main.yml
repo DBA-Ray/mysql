@@ -21,6 +21,7 @@ etcdir: "{{ basedir }}/etc"
 logdir: "{{ basedir }}/log"
 socket: /tmp/mysql.sock
 # Basic parameters
+group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
 mysql_port: 3377
 max_connections: 1000
 timeout: 100
