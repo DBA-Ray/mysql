@@ -1,33 +1,17 @@
-- name: Add pmm user
-  mysql_user:
-    login_user: root
-    login_password: "{{ root_password }}"
-    name: pmm
-    password: "{{ mysql_monitor_password }}"
-    update_password: always
-    login_port: "{{ mysql_port }}"
-    host: localhost
-    priv: '*.*:SELECT, PROCESS, SUPER, REPLICATION CLIENT, RELOAD'
-    sql_log_bin: yes
-    login_unix_socket: "{{ socket }}"
-    state: present
-  when: ansible_hostname == "{{ primary_hostname }}" or ansible_hostname == "master"
-
 - name: Config pmm server via pmm-admin
-  command: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password '{{ mysql_monitor_password }}'"
+  shell: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password '{{ mysql_monitor_password }}'"
 
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
-  shell: "pmm-admin add mysql --user pmm --password '{{ mysql_monitor_password }}'"
-  loop:
-    - "{{ hostvars[groups['mgr_pro1']]['inventory_hostname'] }}"
-    - "{{ hostvars[groups['mgr_pro2']]['inventory_hostname'] }}"
-    - "{{ hostvars[groups['slave_monitor']]['inventory_hostname'] }}"
-    - "{{ hostvars[groups['mysql']]['inventory_hostname'] }}"
-  when: ansible_hostname in item
+  shell: "pmm-admin add mysql --user pmm --password '{{ pmm_password }}'"
+  when: >
+        ( ansible_hostname not in groups.proxysql_pro1 ) and
+        ( ansible_hostname not in groups.proxysql_pro2 )
 
 - name: Add proxysql via pmm-admin for proxysql group
   shell: "{{ item }}"
   with_items:
     - pmm-admin add proxysql:metrics --dsn "stats:stats@tcp(localhost:6032)/"
     - pmm-admin add linux:metrics
-  when: ansible_hostname in groups.proxysql_pro1 or ansible_hostname in groups.proxysql_pro2
+  when: >
+        ( ansible_hostname in groups.proxysql_pro1 ) or
+        ( ansible_hostname in groups.proxysql_pro2 )

@@ -3,11 +3,11 @@
   gather_facts: True
   remote_user: root
   tasks:
-    - name: Delete ansible host
-      lineinfile:
-        path: /etc/hosts
-        regexp: '^172.17'
-        state: absent
+   # - name: Delete ansible host
+   #   lineinfile:
+   #     path: /etc/hosts
+   #     regexp: '^172.17'
+   #     state: absent
     - name: Add IP address,hostname of all hosts to all hosts
       lineinfile:
         dest: /etc/hosts
@@ -17,6 +17,7 @@
         - "{{ groups.mgr_pro1 }}"
         - "{{ groups.proxysql_pro1 }}"
         - "{{ groups.slave_monitor }}"
+        - "ansible"
     - name: Config hostname
       hostname:
         name: "{{ inventory_hostname_short }}"

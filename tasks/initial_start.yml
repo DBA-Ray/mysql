@@ -107,6 +107,20 @@
     login_unix_socket: "{{ socket }}"
     state: present
 
+- name: Add remote root user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: root
+    password: "{{ root_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ user_whitelist.stdout }}"
+    priv: '*.*:ALL,GRANT'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
 - name: Add repl user
   mysql_user:
     login_user: root

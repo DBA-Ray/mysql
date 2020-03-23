@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: ansible
   gather_facts: True
   remote_user: root
   vars:
