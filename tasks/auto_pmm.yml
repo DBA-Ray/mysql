@@ -30,7 +30,7 @@
 - name: Config Docker Root Dir
   lineinfile:
     path: /etc/docker/daemon.json
-    regexp: '\{\}'
+    regexp: '^\{\}'
     line: "\{ {{ install_dir }}/docker \}"
     owner: root
     group: root
