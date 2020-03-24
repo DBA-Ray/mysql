@@ -1,3 +1,6 @@
+- name: Remove orphaned services
+  shell: "pmm-admin repair"
+
 - name: Config pmm server via pmm-admin
   shell: "pmm-admin config --server ansible:{{ pmm_server_http_port }} --server-user pmm --server-password '{{ mysql_monitor_password }}'"
 

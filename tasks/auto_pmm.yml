@@ -5,8 +5,8 @@
 
 - name: Uninstall docker
   yum:
-    name: docker
-    state: absent
+   name: docker
+   state: absent
 
 - name: Remove docker directory
   file:
@@ -23,15 +23,24 @@
     name: docker
     state: started
     enabled: yes
-
+    
+- name: Start docker server
+  systemd:
+    name: docker
+    state: started
+    
+- name: Stop docker server
+  systemd:
+    name: docker
+    state: stopped
+    
 - name: Copy docker directory to installdir
   copy: src=/var/lib/docker dest={{ install_dir }} remote_src=yes
 
 - name: Config Docker Root Dir
-  lineinfile:
-    path: /etc/docker/daemon.json
-    regexp: '^\{\}'
-    line: "\{ {{ install_dir }}/docker \}"
+  template:
+    dest: /etc/docker/daemon.json
+    src: daemon.json.j2
     owner: root
     group: root
     mode: '0644'
