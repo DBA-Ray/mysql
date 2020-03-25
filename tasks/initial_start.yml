@@ -12,12 +12,12 @@
 - name: Create directories for mysql
   file: path={{ item }} state=directory owner=mysql group=mysql
   with_items:
-    - "{{ etcdir }}"
-    - "{{ logdir }}"
     - "{{ package_dir }}"
-    - "{{ basedir }}"
     - "{{ shelldir }}"
     - "{{ monitordir }}"
+    - "{{ basedir }}"
+    - "{{ etcdir }}"
+    - "{{ logdir }}"
 
 - name: 复制安装包
   copy:
