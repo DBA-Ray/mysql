@@ -23,17 +23,17 @@
     name: docker
     state: started
     enabled: yes
-    
+
 - name: Start docker server
   systemd:
     name: docker
     state: started
-    
+
 - name: Stop docker server
   systemd:
     name: docker
     state: stopped
-    
+
 - name: Copy docker directory to installdir
   copy: src=/var/lib/docker dest={{ install_dir }} remote_src=yes
 
