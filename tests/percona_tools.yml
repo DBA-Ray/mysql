@@ -3,7 +3,7 @@
   gather_facts: True
   remote_user: root
   vars:
-    percona_tools: False # Whether to install percona tools
+    percona_tools: True # Whether to install percona tools
     auto_config_pmm: True # Whether to config pmm client connect to pmm server
   roles:
     - dba_ray.mysql

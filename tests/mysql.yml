@@ -2,10 +2,8 @@
 - hosts: mysql
   gather_facts: True
   remote_user: root
-  serial: 1
-  max_fail_percentage: 20
   vars:
-    is_standalone: False # Whether to install stand-alone version
-    mysql_traditional_replication: False # Whether to enable semi-synchronous replication
+    is_standalone: True # Whether to install stand-alone version
+    mysql_traditional_replication: True # Whether to enable semi-synchronous replication
   roles:
     - dba_ray.mysql
