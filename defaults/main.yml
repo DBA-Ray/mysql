@@ -7,9 +7,9 @@ deploy_hosts: mgr_pro2
 pmm_server_env_custom: {}
 pmm_server_http_port: 7070
 # Directory path
-mysql_upgrade_version: mysql-8.0.19-el7-x86_64
+mysql_upgrade_version: mysql-8.0.20-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.19-el7-x86_64
+mysql_version: mysql-8.0.20-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 install_dir: /var/local
 package_dir: "{{ install_dir }}/package"
@@ -19,6 +19,7 @@ monitordir: "{{ install_dir }}/monitor"
 datadir: "{{ basedir }}/data"
 etcdir: "{{ basedir }}/etc"
 logdir: "{{ basedir }}/log"
+masterdir: "{{ basedir }}/master"
 socket: /tmp/mysql.sock
 # Basic parameters
 group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa

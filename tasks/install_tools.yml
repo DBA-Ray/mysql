@@ -1,7 +1,10 @@
 - name: Install the percona-release repository
   yum:
-    name: https://www.percona.com/downloads/percona-release/redhat/LATEST/percona-release-latest.noarch.rpm
+    name: https://www.percona.com/downloads/percona-release/redhat/percona-release-1.0-15.noarch.rpm
     state: present
+  register: percona_release
+  retries: 3
+  until: percona_release is succeeded
 
 - name: Copy the percona-release.repo
   copy: src=percona-release.repo dest=/etc/yum.repos.d/percona-release.repo

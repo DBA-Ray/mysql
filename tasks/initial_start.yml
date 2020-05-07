@@ -18,6 +18,7 @@
     - "{{ basedir }}"
     - "{{ etcdir }}"
     - "{{ logdir }}"
+    - "{{ masterdir }}"
 
 - name: 复制安装包
   copy:
@@ -71,6 +72,15 @@
 
 - name: Auto config my.cnf
   shell: "sh -x {{ etcdir }}/my.cnf_auto.sh"
+  
+- name: Modify read_only parameter in my.cnf
+  replace:
+    path: "{{ etcdir }}/my.cnf"
+    regexp: "{{ item.original }}"
+    replace: "{{ item.change }}"
+  with_items:
+    - { original: '#read_only = 1', change: 'read_only = 1' }
+  when: is_slave
 
 - name: Obtain user_whitelist
   shell: "cat /tmp/user_whitelist.txt"
@@ -103,7 +113,6 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     priv: '*.*:ALL,GRANT'
-    sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
 
