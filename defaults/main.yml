@@ -27,5 +27,6 @@ mysql_port: 3377
 max_connections: 1000
 timeout: 100
 tmp_size: 1G
+thread_cache_size: 100
 # primary hostname for mgr
 primary_hostname: mgr4

@@ -90,6 +90,9 @@
   max_connect_errors = 100000
   max_allowed_packet = 1072693248 #必须小于slave_max_allowed_packet的默认值1073741824（1G）
 
+# thread optimization
+  thread_cache_size = {{ thread_cache_size }} #default value: 8 + (max_connections / 100) maxvalue: 100
+
 # table缓存优化（建议10倍于max_connections）
   table_open_cache = 10000
   table_definition_cache = 10000
