@@ -94,8 +94,8 @@
   thread_cache_size = {{ thread_cache_size }} #default value: 8 + (max_connections / 100) maxvalue: 100
 
 # table缓存优化（建议10倍于max_connections）
-  table_open_cache = 10000
-  table_definition_cache = 10000
+  table_open_cache = 20000
+  table_definition_cache = 20000
 
 # 避免MySQL的外部锁定，减少出错几率增强稳定性。
   skip_external_locking
@@ -104,9 +104,10 @@
   innodb_buffer_pool_size = 25G
   innodb_log_file_size = 256M #mysqladmin extended -uroot -pxxxxxxxx -r -i 60 -c 3 |grep "innodb_os_log_written"
   innodb_flush_method=O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选
-  innodb_open_files = 10000
+  innodb_open_files = 20000
   innodb_io_capacity = 5000
   innodb_io_capacity_max = 50000
+  innodb_flush_sync = 0 #To adhere to the I/O rate defined by the innodb_io_capacity setting
   innodb_log_compressed_pages = OFF #固态硬盘可以关闭
   innodb_read_io_threads = 4
   innodb_write_io_threads = 4

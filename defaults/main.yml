@@ -24,9 +24,9 @@ socket: /tmp/mysql.sock
 # Basic parameters
 group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
 mysql_port: 3377
-max_connections: 1000
+max_connections: 2000
 timeout: 100
 tmp_size: 1G
-thread_cache_size: 100
+thread_cache_size: 200
 # primary hostname for mgr
 primary_hostname: mgr4

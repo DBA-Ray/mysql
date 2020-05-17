@@ -24,7 +24,7 @@ ExecStart={{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my.cnf $MYSQLD_O
 EnvironmentFile=-/etc/sysconfig/mysql
 
 # Sets open_files_limit
-LimitNOFILE = 21010
+LimitNOFILE = 42010
 
 Restart=on-failure
 
