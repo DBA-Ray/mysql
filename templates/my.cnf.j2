@@ -70,7 +70,7 @@
   loose-group_replication_compression_threshold = 131072 #大于128K的有效负载的事务被压缩，减少网络带宽的压力,必须小于2113929216 bytes（1.965G）的数据包
   loose-group_replication_communication_max_message_size = 2097152 #压缩后的事务大于2M将对其分片，增加网络传输效率
 # semi replication
- #rpl_semi_sync_master_timeout = 1000
+ #rpl_semi_sync_master_timeout = 500
  #rpl_semi_sync_slave_enabled = 1
  #rpl_semi_sync_master_enabled = 1
 
