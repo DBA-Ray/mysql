@@ -129,9 +129,9 @@
   user = mysql
   skip_name_resolve #生产环境中必须设置这个参数，否则反向解析缓慢时，会导致MySQL连接缓慢，出现严重的性能问题
   local_infile=OFF
-  ssl-ca={{ master }}/ca.pem
-  ssl-cert={{ master }}/client-cert.pem
-  ssl-key={{ master }}/client-key.pem
+  ssl-ca={{ masterdir }}/ca.pem
+  ssl-cert={{ masterdir }}/client-cert.pem
+  ssl-key={{ masterdir }}/client-key.pem
 
 # 超时时间
   wait_timeout = {{ timeout }}
