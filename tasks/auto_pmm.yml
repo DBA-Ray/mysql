@@ -51,10 +51,10 @@
     state: started
 
 - name: Docker pull image
-  shell: "docker pull percona/pmm-server:latest"
+  shell: "docker pull percona/pmm-server:2"
 
 - name: Docker create container
-  shell: "docker create -v /opt/prometheus/data -v /opt/consul-data -v /var/lib/mysql -v /var/lib/grafana --name pmm-data percona/pmm-server:latest /bin/true"
+  shell: "docker create -v /srv --name pmm-data percona/pmm-server:2 /bin/true"
 
 - name: Dcoer run container
-  shell: "docker run -d -p {{ pmm_server_http_port }}:80 --volumes-from pmm-data --name pmm-server -e SERVER_USER=pmm -e SERVER_PASSWORD='{{ mysql_monitor_password }}' --restart always percona/pmm-server:latest"
+  shell: "docker run -d -p {{ pmm_server_http_port }}:80 --volumes-from pmm-data --name pmm-server --restart always percona/pmm-server:2"
