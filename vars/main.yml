@@ -16,8 +16,3 @@ packages:
 
 vars_files:
   - secrets.yml
-
-__pmm_server_env_defined:
-  SERVER_USER: pmm
-  SERVER_PASSWORD: "{{ pmm_password }}"
-__pmm_server_env: "{{ __pmm_server_env_defined | combine(pmm_server_env_custom) }}"

@@ -3,9 +3,6 @@
 whether_uninstall: True
 # Which hosts to deploy
 deploy_hosts: mgr_pro2
-# Set custom env for pmm additional options
-pmm_server_env_custom: {}
-pmm_server_http_port: 7070
 # Directory path
 mysql_upgrade_version: mysql-8.0.20-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
