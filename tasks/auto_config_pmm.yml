@@ -2,7 +2,7 @@
   shell: "pmm-admin config --server-insecure-tls --server-url=https://admin:admin@ansible:443"
 
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
-  shell: "pmm-admin add mysql --query-source=slowlog --username=pmm --password='{{ pmm_password }}' ps-mysql 127.0.0.1:{{ mysql_port }}"
+  shell: "pmm-admin add mysql --query-source=slowlog --username=pmm --password='{{ pmm_password }}' --host=127.0.0.1 --port={{ mysql_port }}"
   when: >
         ( ansible_hostname not in groups.proxysql_pro1 ) and
         ( ansible_hostname not in groups.proxysql_pro2 )
@@ -10,7 +10,7 @@
 - name: Add proxysql via pmm-admin for proxysql group
   shell: "{{ item }}"
   with_items:
-    - pmm-admin add proxysql --username=admin --password=admin --host=127.0.0.1 --port=6032
+    - "pmm-admin add proxysql --username=admin --password={{ admin_login_password }} --host=127.0.0.1 --port=6032"
   when: >
         ( ansible_hostname in groups.proxysql_pro1 ) or
         ( ansible_hostname in groups.proxysql_pro2 )

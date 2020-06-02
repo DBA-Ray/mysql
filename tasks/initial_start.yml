@@ -184,4 +184,4 @@
     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
 
 - name: set persist default_collation_for_utf8mb4=utf8mb4_general_ci;
-  shell: "mysql -uroot -p{{ root_password }} -e /"set persist default_collation_for_utf8mb4=utf8mb4_general_ci;/""
+  shell: "mysql -uroot -p{{ root_password }} -e /'set persist default_collation_for_utf8mb4=utf8mb4_general_ci;/'"
