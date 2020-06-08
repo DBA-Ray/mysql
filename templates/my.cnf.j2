@@ -14,10 +14,12 @@
   sync_binlog = 1 #最安全，最多丢失一个事务，需要SSD磁盘，ext4格式
 
 # per_thread_buffers
-  join_buffer_size = 512K #用于完全连接（当不使用索引的时候使用连接操作）的缓冲区的大小
-  sort_buffer_size = 512K #每个排序线程分配的缓冲区的大小（当用不到索引会在内部临时排序使用此缓冲区）
-  read_rnd_buffer_size = 512K #排序后，按照排序后的顺序读取行时，则通过该缓冲区读取行，以避免搜索硬盘
-  read_buffer_size = 512K #每个线程连续扫描时为扫描的每个表分配的缓冲区的大小
+  join_buffer_size = 256K #用于完全连接（当不使用索引的时候使用连接操作）的缓冲区的大小
+  sort_buffer_size = 256K #每个排序线程分配的缓冲区的大小（当用不到索引会在内部临时排序使用此缓冲区）
+  read_rnd_buffer_size = 256K #排序后，按照排序后的顺序读取行时，则通过该缓冲区读取行，以避免搜索硬盘
+  read_buffer_size = 256K #每个线程连续扫描时为扫描的每个表分配的缓冲区的大小
+  binlog_cache_size = 256K #用于在事务期间保存对二进制日志的更改的内存缓冲区的大小
+  binlog_stmt_cache_size = 32k #用于在非事务期间保存对二进制日志的更改的内存缓冲区的大小
 
 # basic
   basedir = {{ basedir }}
