@@ -65,9 +65,7 @@ CREATE FUNCTION gr_member_in_primary_partition()
 RETURNS VARCHAR(3)
 DETERMINISTIC
 BEGIN
-  RETURN (SELECT IF( MEMBER_STATE='ONLINE' AND ((SELECT COUNT(*) FROM
-performance_schema.replication_group_members WHERE MEMBER_STATE != 'ONLINE') >=
-((SELECT COUNT(*) FROM performance_schema.replication_group_members)/2) = 0),
+  RETURN (SELECT IF( MEMBER_STATE='ONLINE',
 'YES', 'NO' ) FROM performance_schema.replication_group_members a JOIN
 performance_schema.replication_group_member_stats b USING(member_id) where a.member_id=@@server_uuid);
 END$$
