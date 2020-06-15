@@ -23,7 +23,7 @@ group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
 mysql_port: 3377
 max_connections: 2000
 timeout: 3600
-tmp_size: 1G
+tmp_size: 64M
 thread_cache_size: 400
 # primary hostname for mgr
 primary_hostname: mgr4
