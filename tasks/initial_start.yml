@@ -72,7 +72,7 @@
 
 - name: Auto config my.cnf
   shell: "sh -x {{ etcdir }}/my.cnf_auto.sh"
-  
+
 - name: Modify read_only parameter in my.cnf
   replace:
     path: "{{ etcdir }}/my.cnf"
