@@ -25,5 +25,7 @@ max_connections: 2000
 timeout: 3600
 tmp_size: 64M
 thread_cache_size: 400
+log_queries_not_using_indexes: 0
+min_examined_row_limit: 0
 # primary hostname for mgr
 primary_hostname: mgr4
