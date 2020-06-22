@@ -29,7 +29,7 @@
   file:
     path: "{{ datadir }}"
     state: absent
-    remote_src: 'True'
+    remote_src: yes
   when: whether_uninstall
 
 #- name: 更新所有软件包

@@ -73,6 +73,12 @@
 - name: Auto config my.cnf
   shell: "sh -x {{ etcdir }}/my.cnf_auto.sh"
 
+- name: Remove my.cnf_auto.sh
+  file:
+    path: "{{ etcdir }}/my.cnf_auto.sh"
+    state: absent
+    remote_src: yes
+
 - name: Modify read_only parameter in my.cnf
   replace:
     path: "{{ etcdir }}/my.cnf"
