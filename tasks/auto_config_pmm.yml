@@ -10,7 +10,7 @@
 - name: Add proxysql via pmm-admin for proxysql group
   shell: "{{ item }}"
   with_items:
-    - "pmm-admin add proxysql --username=admin --password={{ admin_login_password }} --host=127.0.0.1 --port=6032"
+    - "pmm-admin add proxysql --username=admin --password='{{ admin_login_password }}' --host=127.0.0.1 --port=6032"
   when: >
         ( ansible_hostname in groups.proxysql_pro1 ) or
         ( ansible_hostname in groups.proxysql_pro2 )
