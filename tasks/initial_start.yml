@@ -159,7 +159,7 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: 127.0.0.1
-    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT,BACKUP_ADMIN/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
+    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
