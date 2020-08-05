@@ -14,6 +14,17 @@
     name: mariadb
     state: absent
 
+- name: Install the mysql repo
+  yum:
+    name: "{{ remote_repo }}"
+    state: present
+  register: repo
+  retries: 7
+  until: repo is succeeded
+
+- name: Copy the mysql-community.repo
+  copy: src=mysql-community.repo dest=/etc/yum.repos.d/mysql-community.repo
+
 - name: Install base packages
   yum:
     name: "{{ packages }}"

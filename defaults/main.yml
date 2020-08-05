@@ -3,6 +3,8 @@
 whether_uninstall: True
 # Which hosts to deploy
 deploy_hosts: mgr_pro2
+# Repo info
+remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Directory path
 mysql_upgrade_version: mysql-8.0.20-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
