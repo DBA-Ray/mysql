@@ -14,6 +14,7 @@ packages:
   - expect
   - MySQL-python
   - mysql-shell
+  - zstd
 
 vars_files:
   - secrets.yml
