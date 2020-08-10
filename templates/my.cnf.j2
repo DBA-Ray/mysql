@@ -12,6 +12,7 @@
   binlog_transaction_compression_level_zstd = 12
   transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。
   sync_binlog = 1 #最安全，最多丢失一个事务，需要SSD磁盘，ext4格式
+  binlog_rows_query_log_events = 1
 
 # per_thread_buffers
   join_buffer_size = 256K #处理逻辑是驱动表的一行和非驱动表联合查找，这时就可以将非驱动表放入join_buffer，不需要访问拥有并发保护机制的buffer_pool
