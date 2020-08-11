@@ -9,7 +9,7 @@
   binlog_transaction_dependency_tracking = WRITESET
   binlog_checksum = NONE
   binlog_transaction_compression = ON
-  binlog_transaction_compression_level_zstd = 12
+  binlog_transaction_compression_level_zstd = 7 #（1-22）
   transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。
   sync_binlog = 1 #最安全，最多丢失一个事务，需要SSD磁盘，ext4格式
   binlog_rows_query_log_events = 1
@@ -69,6 +69,8 @@
   loose-group_replication_autorejoin_tries = 3 #每次尝试自动连接间隔5分钟，在被驱逐出组或者到达group_replication_unreachable_majority_timeout的时间触发
   loose-group_replication_unreachable_majority_timeout = 3600 #节点由ONLINE状态进入UNREACHABLE状态后等待的时间,如果仍保持UNREACHABLE，则将节点置为ERROR状态
   loose-group_replication_compression_threshold = 131072 #大于128K的有效负载的事务被压缩，减少网络带宽的压力,必须小于2113929216 bytes（1.965G）的数据包
+  group_replication_recovery_compression_algorithms = zstd #压缩算法
+  group_replication_recovery_zstd_compression_level = 7 #压缩级别，越大压缩力越大，比较消耗CPU和内存资源（1-22）
   loose-group_replication_communication_max_message_size = 2097152 #压缩后的事务大于2M将对其分片，增加网络传输效率
 # semi replication
  #rpl_semi_sync_master_timeout = 500
