@@ -30,3 +30,5 @@ WHERE
 	WHERE
 	`VARIABLE_NAME` = 'server_uuid'
 	);
+
+-- 不建议使用，当一个节点执行reset slave all时，会导致proxysql不可用

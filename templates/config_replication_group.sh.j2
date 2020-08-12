@@ -16,7 +16,7 @@ if [ "{{ ansible_hostname }}" == "{{ primary_hostname }}" ]
 
 then
 
-mysql -uroot -p${1} < /tmp/mgr_monitor.sql
+mysql -uroot -p${1} < /tmp/mgr_monitor_official.sql
 
 mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;\
 CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';\
