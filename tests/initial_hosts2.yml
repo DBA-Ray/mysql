@@ -1,13 +1,11 @@
 ---
-- hosts: mgr_pro2:proxysql_pro2:slave_monitor
+- hosts: mgr_pro2:proxysql_pro2:slave_monitor:ansible
   gather_facts: True
   remote_user: root
   tasks:
-    #- name: Delete ansible host
-    #  lineinfile:
-    #    path: /etc/hosts
-    #    regexp: '^172.17'
-    #    state: absent
+    - name: ssh-copy
+      authorized_key: user=root key="{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+
     - name: Add IP address,hostname of all hosts to all hosts
       lineinfile:
         dest: /etc/hosts
@@ -18,6 +16,7 @@
         - "{{ groups.proxysql_pro2 }}"
         - "{{ groups.slave_monitor }}"
         - "ansible"
+
     - name: Config hostname
       hostname:
         name: "{{ inventory_hostname_short }}"
