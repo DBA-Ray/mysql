@@ -107,7 +107,6 @@
 - name: Enable mysql server
   systemd:
     name: mysqld
-    state: started
     enabled: yes
 
 - name: Modify root password
