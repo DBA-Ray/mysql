@@ -27,5 +27,8 @@
 - include: auto_config_pmm.yml
   when: auto_config_pmm | default(False)
 
-- include: upgrade.yml
-  when: is_update | default(False)
+- include: upgrade_my_cnf.yml
+  when: upgrade_my_cnf | default(False)
+
+- include: upgrade_server.yml
+  when: upgrade_server | default(False)

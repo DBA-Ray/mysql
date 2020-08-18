@@ -25,7 +25,7 @@ group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
 mysql_port: 3377
 max_connections: 2000
 timeout: 3600
-tmp_size: 64M
+tmp_size: 16M
 thread_cache_size: 400
 log_queries_not_using_indexes: 0
 min_examined_row_limit: 0

@@ -3,14 +3,14 @@
     src: "{{ mysql_upgrade_package }}"
     dest: "{{ package_dir }}"
 
-- name: 解压安装包
+- name: Decompression package
   unarchive:
     src: "{{ package_dir }}/{{ mysql_upgrade_package }}"
     dest: "{{ package_dir }}"
     remote_src: yes
   run_once: True
 
-- name: 停止mysql服务
+- name: Stop mysql server
   systemd:
     name: mysqld
     state: stopped
@@ -18,8 +18,7 @@
 - name: Copy the upgrade package
   shell: "cp -rf {{ package_dir }}/{{ mysql_upgrade_version }}/* {{ basedir }}/"
 
-- name: 启动mysql服务
+- name: Start mysql server
   systemd:
     name: mysqld
     state: started
-  #notify: Set default_collation_for_utf8mb4 variable to utf8mb4_general_ci

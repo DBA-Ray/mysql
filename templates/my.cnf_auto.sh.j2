@@ -20,9 +20,11 @@ innodb_write_io_threads=`expr $processor - $innodb_read_io_threads`
 
 #自动根据memory计算出innodb缓冲池大小
 
-mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'`
+#by innodb_dedicated_server
 
-innodb_buffer_pool=`expr $mem \* $a / $b`
+#mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'` 
+
+#innodb_buffer_pool=`expr $mem \* $a / $b`
 
 #自动赋值server_id,取IP最后一位
 
@@ -50,7 +52,7 @@ auto_increment=`cat /etc/hosts | grep proxysql | awk 'END{print NR}'`
 
 sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my.cnf
 
-sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my.cnf 
+sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my.cnf
 
 sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my.cnf
 
@@ -58,7 +60,9 @@ sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io
 
 sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my.cnf
 
-sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
+#by innodb_dedicated_server
+
+#sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
 
 sed -i 's|group_replication_ip_whitelist = 1|group_replication_ip_whitelist = '"${whitelist}"'|g' {{ etcdir }}/my.cnf
 

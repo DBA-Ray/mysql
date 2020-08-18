@@ -177,7 +177,7 @@
     - { original: 'rpl_semi_sync_master_timeout', change: '500' }
     - { original: 'clone_enable_compression', change: '1' }
 
-- name: Modify semisync parameter in my.cnf
+- name: Modify semisync parameter and clone parameter in my.cnf
   replace:
     path: "{{ etcdir }}/my.cnf"
     regexp: "{{ item.original }}"
