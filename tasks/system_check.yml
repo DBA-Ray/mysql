@@ -14,6 +14,9 @@
     name: mariadb
     state: absent
 
+- name: Disable kernel hugepage
+  shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled;echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+
 - name: Install the mysql repo
   yum:
     name: "{{ remote_repo }}"

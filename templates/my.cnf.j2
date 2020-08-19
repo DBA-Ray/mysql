@@ -103,7 +103,7 @@
 
 # table缓存优化（建议10倍于max_connections）
   table_open_cache = 20000
-  table_definition_cache = 20000
+  #table_definition_cache = 20000 #MIN（400 + table_open_cache / 2, 2000）
 
 # 避免MySQL的外部锁定，减少出错几率增强稳定性。
   skip_external_locking
@@ -115,7 +115,7 @@
   #innodb_log_file_size = 256M #by innodb_dedicated_server
   #innodb_flush_method = O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
   #innodb_log_files_in_group = 2 #by innodb_dedicated_server
-  innodb_open_files = 20000
+  innodb_open_files = 20000 #随table_open_cache变化
   innodb_io_capacity = 5000
   innodb_io_capacity_max = 50000
   innodb_flush_sync = 0 #To adhere to the I/O rate defined by the innodb_io_capacity setting
