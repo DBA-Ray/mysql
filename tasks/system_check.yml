@@ -17,6 +17,14 @@
 - name: Disable kernel hugepage
   shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled;echo never > /sys/kernel/mm/transparent_hugepage/defrag"
 
+- name: Disable swap
+  sysctl:
+    name: vm.swappiness
+    value: '0'
+    sysctl_file: /etc/sysctl.conf
+    state: present
+    reload: yes
+
 - name: Disable file system atime
   mount:
     path: "{{ install_dir }}"
@@ -24,6 +32,7 @@
     fstype: ext4
     opts: noatime
     state: present
+    backup: yes
 
 - name: Remount file path
   mount:
