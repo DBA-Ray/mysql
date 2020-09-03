@@ -1,14 +1,14 @@
 ---
 # Whether to uninstall the original service and then install it
-whether_uninstall: True
+whether_uninstall: False
 # Which hosts to deploy
 deploy_hosts: mgr_pro2
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Directory path
-mysql_upgrade_version: mysql-8.0.20-el7-x86_64
+mysql_upgrade_version: mysql-8.0.21-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.20-el7-x86_64
+mysql_version: mysql-8.0.21-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 fstab_src: /dev/vdb
 install_dir: /var/local
