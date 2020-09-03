@@ -4,7 +4,7 @@
   when: ( is_standalone | default(False) ) or ( auto_pmm | default(False) ) or ( auto_config_pmm | default(False) )
 
 - include: system_check.yml
-  when: is_standalone | default(False)
+  when: is_standalone | default(False) or ( upgrade_my_cnf | default(False) )
 
 - include: initial_start.yml
   when: is_standalone | default(False)

@@ -17,6 +17,22 @@
 - name: Disable kernel hugepage
   shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled;echo never > /sys/kernel/mm/transparent_hugepage/defrag"
 
+- name: Disable file system atime
+  mount:
+    path: "{{ install_dir }}"
+    src: "{{ fstab_src }}"
+    fstype: ext4
+    opts: noatime
+    state: present
+
+- name: Remount file path
+  mount:
+    path: "{{ install_dir }}"
+    src: "{{ fstab_src }}"
+    fstype: ext4
+    opts: noatime
+    state: remounted
+
 - name: Install the mysql repo
   yum:
     name: "{{ remote_repo }}"

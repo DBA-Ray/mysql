@@ -10,6 +10,7 @@ mysql_upgrade_version: mysql-8.0.20-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.20-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
+fstab_src: /dev/vdb
 install_dir: /var/local
 package_dir: "{{ install_dir }}/package"
 basedir: "{{ install_dir }}/mysql"
