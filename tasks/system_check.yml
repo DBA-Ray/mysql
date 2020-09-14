@@ -30,7 +30,7 @@
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
     fstype: ext4
-    opts: noatime
+    opts: defaults,noatime,nobarrier
     state: present
     backup: yes
 
@@ -39,7 +39,7 @@
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
     fstype: ext4
-    opts: noatime
+    opts: defaults,noatime,nobarrier
     state: remounted
 
 - name: Install the mysql repo
