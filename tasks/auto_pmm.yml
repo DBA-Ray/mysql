@@ -2,16 +2,19 @@
   systemd:
     name: docker
     state: stopped
+  when: docker_re_install
 
 - name: Uninstall docker
   yum:
    name: docker
    state: absent
+  when: docker_re_install
 
 - name: Remove docker directory
   file:
     path: /var/lib/docker
     state: absent
+  when: docker_re_install
 
 - name: Install docker
   yum:

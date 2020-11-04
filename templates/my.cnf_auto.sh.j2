@@ -8,7 +8,7 @@ a=7
 
 b=10
 
-c=2
+c=3
 
 processor=`cat /proc/cpuinfo |grep "processor"|wc -l`
 
@@ -22,9 +22,9 @@ innodb_write_io_threads=`expr $processor - $innodb_read_io_threads`
 
 #by innodb_dedicated_server
 
-#mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'` 
+mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'` 
 
-#innodb_buffer_pool=`expr $mem \* $a / $b`
+innodb_buffer_pool=`expr $mem \* $a / $b`
 
 #自动赋值server_id,取IP最后一位
 
@@ -62,9 +62,9 @@ sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write
 
 #by innodb_dedicated_server
 
-#sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
 
-sed -i 's|group_replication_ip_whitelist = 1|group_replication_ip_whitelist = '"${whitelist}"'|g' {{ etcdir }}/my.cnf
+sed -i 's|group_replication_ip_allowlist = 1|group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my.cnf
 
 echo $user_whitelist > /tmp/user_whitelist.txt
 

@@ -4,5 +4,6 @@
   remote_user: root
   vars:
     auto_pmm: True # Whether to deploy pmm and send logs scripts via shell
+    docker_re_install: True # Whether to re_install docker
   roles:
     - dba_ray.mysql

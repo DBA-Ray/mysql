@@ -30,7 +30,7 @@ GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'repl'@'{{ user_whitelist.stdout }}';fl
 
 else
 
-sleep 3
+sleep 30
 
 mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl',\
 MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
