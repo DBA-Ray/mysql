@@ -73,6 +73,7 @@
   loose-group_replication_recovery_compression_algorithms = zstd #压缩算法
   loose-group_replication_recovery_zstd_compression_level = 7 #压缩级别，越大压缩力越大，比较消耗CPU和内存资源（1-22）
   loose-group_replication_communication_max_message_size = 2097152 #压缩后的事务大于2M将对其分片，增加网络传输效率
+  loose-group_replication_member_weight = 1
 # semi replication
  #rpl_semi_sync_master_timeout = 500
  #rpl_semi_sync_slave_enabled = 1

@@ -25,22 +25,43 @@
     state: present
     reload: yes
 
-- name: Disable file system atime
+- name: Disable file system atime,barrier for root directory
+  mount:
+    path: /
+    src: "{{ ansible_cmdline.root }}"
+    fstype: ext4
+    opts: defaults,noatime,nobarrier
+    state: mounted
+    backup: yes
+    dump: '1'
+    passno: '1'
+
+- name: Remount file path for root directory
+  mount:
+    path: /
+    src: "{{ ansible_cmdline.root }}"
+    fstype: ext4
+    opts: defaults,noatime,nobarrier
+    state: remounted
+
+- name: Disable file system atime,barrier for data directory
   mount:
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
     fstype: ext4
     opts: defaults,noatime,nobarrier
-    state: present
+    state: mounted
     backup: yes
+  when: whether_remount_data_disk
 
-- name: Remount file path
+- name: Remount file path for data directory
   mount:
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
     fstype: ext4
     opts: defaults,noatime,nobarrier
     state: remounted
+  when: whether_remount_data_disk
 
 - name: Install the mysql repo
   yum:
@@ -68,7 +89,7 @@
   file:
     path: "{{ datadir }}"
     state: absent
-    remote_src: yes
+    remote_src: 'yes'
   when: whether_uninstall
 
 #- name: 更新所有软件包
