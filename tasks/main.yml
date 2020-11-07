@@ -15,9 +15,6 @@
 - include: initial_slave_monitor.yml
   when: ( is_standalone | default(False) ) and ( slave_monitor_replication | default(False) )
 
-- include: initial_replication.yml
-  when: ( is_standalone | default(False) ) and ( mysql_traditional_replication | default(False) )
-
 - include: install_tools.yml
   when: percona_tools | default(False)
 
