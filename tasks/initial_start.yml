@@ -20,24 +20,26 @@
     - "{{ logdir }}"
     - "{{ masterdir }}"
 
-- name: 复制安装包
+- name: Copy mysql compressed package
   copy:
     src: "{{ package_name }}"
     dest: "{{ package_dir }}"
+  run_once: True
 
-- name: 解压安装包
+- name: Uncompress mysql package to package dir
   unarchive:
     src: "{{ package_dir }}/{{ package_name }}"
-    dest: "{{ package_dir }}"
+    dest: "{{ basedir }}"
     remote_src: yes
+  run_once: True
 
-- name: 复制mysql二进制包
+- name: Copy uncompressed package
   copy:
     src: "{{ package_dir }}/{{ mysql_version }}/"
     dest: "{{ basedir }}"
     remote_src: yes
 
-- name: 把mysql执行路径添加至环境变量
+- name: Add the mysql execution path to the environment variable
   lineinfile:
     path: /etc/profile
     line: export PATH={{ basedir }}/bin:$PATH

@@ -1,15 +1,13 @@
-# 系统环境检测，排除干扰
-
-- name: 关闭firewalld
+- name: Stop firewalld
   service: name=firewalld state=stopped enabled=no
 
-- name: 永久关闭selinux
+- name: Disable selinux
   lineinfile:
     dest: /etc/selinux/config
     regexp: "^SELINUX="
     line: "SELINUX=disabled"
 
-- name: 卸载系统自带的mariadb
+- name: Uninstall mariadb
   yum:
     name: mariadb
     state: absent
@@ -92,7 +90,7 @@
     remote_src: 'yes'
   when: whether_uninstall
 
-#- name: 更新所有软件包
+#- name: upgrade all packages
 #  yum:
 #    name: '*'
 #    state: latest

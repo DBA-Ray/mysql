@@ -1,6 +1,5 @@
 ---
 # vars file for mysql_ray
-# 基础软件包
 packages:
   - vim
   - lrzsz
