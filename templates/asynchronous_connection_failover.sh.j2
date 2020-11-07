@@ -26,6 +26,6 @@ weight_tmp=`echo ${hostname: -1}`
 
 weight=`expr $weight_tmp \* $b`
 
-mysql -uroot -p${1} -e "SELECT asynchronous_connection_failover_add_source('mgr_single','${hostname}',3377,null,${weight});"
+mysql -uroot -p${1} -e "SELECT asynchronous_connection_failover_add_source('mgr_single','${hostname}',{{ mysql_port }},null,${weight});"
 
 done
