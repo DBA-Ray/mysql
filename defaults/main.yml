@@ -10,7 +10,8 @@ mysql_upgrade_version: mysql-8.0.22-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.22-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-fstab_src: /dev/vdb
+whether_remount_data_disk: false
+fstab_src: /
 install_dir: /var/local
 package_dir: "{{ install_dir }}/package"
 basedir: "{{ install_dir }}/mysql"
@@ -32,3 +33,5 @@ log_queries_not_using_indexes: 0
 min_examined_row_limit: 0
 # primary hostname for mgr
 primary_hostname: mgr1
+# business info
+business_user: ttjb

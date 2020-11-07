@@ -1,0 +1,31 @@
+#!/bin/bash
+
+source /etc/profile
+
+if [ $# -ne 2 ]
+
+then
+
+    echo "usage: `basename $0` [root_passwd|repl_passwd]"
+
+    exit 1
+
+fi
+
+b=10 #weight constant
+
+mysql -uroot -p${1} -e "change master to master_user='repl',master_password='${2}',\
+master_host='mgr1',master_auto_position=1,source_connection_auto_failover=1,\
+master_port={{ mysql_port }},master_retry_count=5,master_connect_retry=6 for channel 'mgr_single';"
+
+grep -v "^$" /etc/hosts|grep -v "^#"|grep mgr|awk '{print $2}'| while read hostname
+
+do
+
+weight_tmp=`echo ${hostname: -1}`
+
+weight=`expr $weight_tmp \* $b`
+
+mysql -uroot -p${1} -e "SELECT asynchronous_connection_failover_add_source('mgr_single','${hostname}',3377,null,${weight});"
+
+done

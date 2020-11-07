@@ -8,5 +8,6 @@
     mutli_primary: False # Default value for is_standalone
     single_primary: True # Default value for is_standalone
     slave_monitor_replication: True # Whether to enable semi-synchronous replication instances for MGR
+    asynchronous_connection_failover: True # Whether to enable asynchronous connection failover
   roles:
     - dba_ray.mysql
