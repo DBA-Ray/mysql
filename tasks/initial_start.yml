@@ -24,14 +24,12 @@
   copy:
     src: "{{ package_name }}"
     dest: "{{ package_dir }}"
-  run_once: True
 
 - name: Uncompress mysql package to package dir
   unarchive:
     src: "{{ package_dir }}/{{ package_name }}"
-    dest: "{{ basedir }}"
+    dest: "{{ package_dir }}/"
     remote_src: yes
-  run_once: True
 
 - name: Copy uncompressed package
   copy:

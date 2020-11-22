@@ -46,7 +46,7 @@
   mount:
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
-    fstype: ext4
+    fstype: xfs
     opts: defaults,noatime,nobarrier
     state: mounted
     backup: yes
@@ -56,7 +56,7 @@
   mount:
     path: "{{ install_dir }}"
     src: "{{ fstab_src }}"
-    fstype: ext4
+    fstype: xfs
     opts: defaults,noatime,nobarrier
     state: remounted
   when: whether_remount_data_disk

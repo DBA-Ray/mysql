@@ -1,5 +1,5 @@
 - name: Config pmm server via pmm-admin
-  shell: "pmm-admin config --server-insecure-tls --server-url=https://admin:admin@ansible:443"
+  shell: "pmm-admin config --force --server-insecure-tls --server-url=https://admin:admin@ansible:443"
 
 - name: Add mysql via pmm-admin for mgr&slave_monitor&mysql group
   shell: "pmm-admin add mysql --query-source=slowlog --username=pmm --password='{{ pmm_password }}' --host=127.0.0.1 --port={{ mysql_port }}"
