@@ -26,7 +26,10 @@ SET GLOBAL group_replication_bootstrap_group=OFF;"
 sleep 3
 
 mysql -uroot -p${1} -e "SET GLOBAL super_read_only=0;\
-GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'repl'@'{{ user_whitelist.stdout }}';flush privileges;"
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'repl'@'{{ user_whitelist.stdout }}';\
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'root'@'localhost';\
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'pmm'@'127.0.0.1';\
+flush privileges;"
 
 else
 
