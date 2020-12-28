@@ -7,6 +7,11 @@
     regexp: "^SELINUX="
     line: "SELINUX=disabled"
 
+- name: Install base packages
+  yum:
+    name: "{{ packages }}"
+    state: latest
+
 - name: Uninstall mariadb
   yum:
     name: mariadb
@@ -71,11 +76,6 @@
 
 - name: Copy the mysql-community.repo
   copy: src=mysql-community.repo dest=/etc/yum.repos.d/mysql-community.repo
-
-- name: Install base packages
-  yum:
-    name: "{{ packages }}"
-    state: latest
 
 - name: Stop mysql server
   systemd:
