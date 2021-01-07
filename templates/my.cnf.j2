@@ -7,6 +7,7 @@
   binlog_format = row
   binlog_expire_logs_seconds = 604800
   binlog_transaction_dependency_tracking = WRITESET
+  binlog_order_commits = 0
   binlog_checksum = CRC32
   binlog_transaction_compression = ON
   binlog_transaction_compression_level_zstd = 7 #（1-22）
@@ -19,7 +20,7 @@
   sort_buffer_size = 256K #执行order by和group by分配，用于存储排序的中间结果，当分配空间大于2M时会使用mmap而不是malloc来进行内存分配，导致效率降低
   read_rnd_buffer_size = 256K #当thread进行随机扫描数据时会首先扫描该buffer空间以避免更多的物理读
   read_buffer_size = 256K #当thread进行顺序扫描数据时会首先扫描该buffer空间以避免更多的物理读
-  binlog_cache_size = 256K #用于在事务期间保存对二进制日志的更改的内存缓冲区的大小
+  binlog_cache_size = 2M #用于在事务期间保存对二进制日志的更改的内存缓冲区的大小
   binlog_stmt_cache_size = 32k #用于在非事务期间保存对二进制日志的更改的内存缓冲区的大小
 
 # basic
