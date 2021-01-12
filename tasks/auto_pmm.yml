@@ -60,4 +60,7 @@
   shell: "docker create -v /srv --name pmm-data percona/pmm-server:2 /bin/true"
 
 - name: Dcoer run container
-  shell: "docker run -d -p 443:443 --volumes-from pmm-data --name pmm-server --restart always percona/pmm-server:2"
+  shell: "docker run --detach --restart always \
+--publish 80:80 --publish 443:443 \
+--volumes-from pmm-data --name pmm-server \
+percona/pmm-server:2"
