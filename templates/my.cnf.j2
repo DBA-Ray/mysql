@@ -9,7 +9,7 @@
   binlog_transaction_dependency_tracking = WRITESET
   binlog_order_commits = 0
   binlog_checksum = CRC32
-  binlog_transaction_compression = ON
+  binlog_transaction_compression = 0
   binlog_transaction_compression_level_zstd = 7 #（1-22）
   transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。
   sync_binlog = 1 #最安全，最多丢失一个事务，需要SSD磁盘，ext4格式
