@@ -222,6 +222,7 @@
     - { original: 'rpl_semi_sync_master_enabled', change: '1' }
     - { original: 'rpl_semi_sync_master_timeout', change: '500' }
     - { original: 'clone_enable_compression', change: '1' }
+    - { original: 'group_replication_start_on_boot', change: '1' }
 
 - name: Modify semisync parameter and clone parameter in my.cnf
   replace:
@@ -233,3 +234,4 @@
     - { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
     - { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }
     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
+    - { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }

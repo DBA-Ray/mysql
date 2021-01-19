@@ -6,9 +6,9 @@ deploy_hosts: mgr_pro1
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Directory path
-mysql_upgrade_version: mysql-8.0.22-el7-x86_64
+mysql_upgrade_version: mysql-8.0.23-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.22-el7-x86_64
+mysql_version: mysql-8.0.23-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 whether_remount_data_disk: True
 fstab_src: /dev/vdb1
