@@ -66,15 +66,19 @@ sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_write_i
 
 sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my.cnf
 
+sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 80|g' {{ etcdir }}/my.cnf
+
 else
 
 sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my.cnf
 
 sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my.cnf
 
+sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 60|g' {{ etcdir }}/my.cnf
+
 fi
 
-sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my.cnf
+#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my.cnf
 
 #by innodb_dedicated_server
 
