@@ -16,6 +16,7 @@
     - "{{ shelldir }}"
     - "{{ monitordir }}"
     - "{{ basedir }}"
+    - "{{ datadir }}"
     - "{{ etcdir }}"
     - "{{ logdir }}"
     - "{{ masterdir }}"

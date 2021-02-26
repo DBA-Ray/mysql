@@ -7,6 +7,9 @@
     regexp: "^SELINUX="
     line: "SELINUX=disabled"
 
+- name: Copy the mysql-community.repo
+  copy: src=mysql-community.repo dest=/etc/yum.repos.d/mysql-community.repo
+
 - name: Install base packages
   yum:
     name: "{{ packages }}"
@@ -73,9 +76,6 @@
   register: repo
   retries: 7
   until: repo is succeeded
-
-- name: Copy the mysql-community.repo
-  copy: src=mysql-community.repo dest=/etc/yum.repos.d/mysql-community.repo
 
 - name: Stop mysql server
   systemd:
