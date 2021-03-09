@@ -31,6 +31,7 @@ tmp_size: 16M
 thread_cache_size: 400
 log_queries_not_using_indexes: 0
 min_examined_row_limit: 0
+sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 # primary hostname for mgr
 primary_hostname: mgr1
 # business info

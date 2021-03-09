@@ -38,6 +38,7 @@
   auto_increment_offset = 1
   auto_increment_increment = 1
   #protocol_compression_algorithms = zstd #只允许zstd,proxysql会报错Invalid compression algorithm 'uncompressed'..
+  sql_mode={{ sql_mode }}
 
 # 日志时间戳改为系统
   log_timestamps = system
@@ -49,8 +50,8 @@
   relay_log_info_repository = TABLE
  #read_only = 1
   slave_parallel_type = logical_clock
-  slave_parallel_workers = 16
-  slave_preserve_commit_order = off
+  slave_parallel_workers = 16 #组复制必须每个节点一致
+  slave_preserve_commit_order = on #组复制必须开启
   log_slave_updates = 1
   relay_log = relay
   relay_log_index = relay.index
