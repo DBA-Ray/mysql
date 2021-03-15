@@ -25,13 +25,15 @@
 
 # basic
   basedir = {{ basedir }}
-  datadir = {{ datadir }}
-  tmpdir = {{ datadir }}
-  socket = /tmp/mysql.sock
-  log-error = {{ logdir }}/mysqld.log
-  pid-file = {{ datadir }}/mysqld.pid
+  datadir = {{ datadir }}_{{ mysql_port }}
+  tmpdir = {{ datadir }}_{{ mysql_port }}
+  socket = /tmp/mysql_{{ mysql_port }}.sock
+  mysqlx_socket = /tmp/mysqlx_{{ mysqlx_port }}.sock
+  log-error = {{ logdir }}/mysqld_{{ mysql_port }}.log
+  pid-file = {{ datadir }}/mysqld_{{ mysql_port }}.pid
   default_authentication_plugin = mysql_native_password
   port = {{ mysql_port }}
+  mysqlx_port = {{ mysqlx_port }}
   character_set_server = utf8mb4
   collation_server = utf8mb4_0900_ai_ci
   lower_case_table_names = 1
@@ -150,8 +152,10 @@
 
 [mysql]
 
-  socket = /tmp/mysql.sock
+  socket = /tmp/mysql_{{ mysql_port }}.sock
+  mysqlx_socket = /tmp/mysqlx_{{ mysqlx_port }}.sock
 
 [client]
 
-  socket = /tmp/mysql.sock
+  socket = /tmp/mysql_{{ mysql_port }}.sock
+  mysqlx_socket = /tmp/mysqlx_{{ mysqlx_port }}.sock
