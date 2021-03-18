@@ -5,6 +5,22 @@ whether_uninstall: False
 deploy_hosts: mgr_pro1
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+# Basic parameters
+group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+mysql_port: 3012
+mysqlx_port: 33770
+max_connections: 2000
+timeout: 3600
+tmp_size: 16M
+thread_cache_size: 400
+log_queries_not_using_indexes: 0
+min_examined_row_limit: 0
+sql_mode: ''
+#sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+# primary hostname for mgr
+primary_hostname: mgr1
+# business info
+business_user: ttjb
 # Directory path
 mysql_upgrade_version: mysql-8.0.23-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
@@ -17,23 +33,8 @@ package_dir: "{{ install_dir }}/package"
 basedir: "{{ install_dir }}/mysql"
 shelldir: "{{ install_dir }}/shell"
 monitordir: "{{ install_dir }}/monitor"
-datadir: "{{ basedir }}/data"
+datadir: "{{ basedir }}/data_{{ mysql_port }}"
 etcdir: "{{ basedir }}/etc"
 logdir: "{{ basedir }}/log"
 masterdir: "{{ basedir }}/master"
-socket: /tmp/mysql.sock
-# Basic parameters
-group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
-mysql_port: 3377
-mysqlx_port = 33770
-max_connections: 2000
-timeout: 3600
-tmp_size: 16M
-thread_cache_size: 400
-log_queries_not_using_indexes: 0
-min_examined_row_limit: 0
-sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
-# primary hostname for mgr
-primary_hostname: mgr1
-# business info
-business_user: ttjb
+socket: "{{ datadir }}/mysql.sock"

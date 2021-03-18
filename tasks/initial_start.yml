@@ -57,8 +57,20 @@
     mode: 0644
   with_items:
     - { src: 'mysql.conf.j2', dest: '/usr/lib/tmpfiles.d/mysql.conf' }
-    - { src: 'mysqld.service.j2', dest: '/usr/lib/systemd/system/mysqld.service' }
-    - { src: 'my.cnf.j2', dest: "{{ etcdir }}/my.cnf" }
+    - { src: 'mysqld.service.j2', dest: '/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service' }
+    - { src: 'my.cnf.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
+
+- name: Rendering mysql5.7 parameter file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mysql
+    group: mysql
+    mode: 0644
+  with_items:
+    - { src: 'mysqld.service57.j2', dest: '/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service' }
+    - { src: 'my.cnf57.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
+  when: mysql57
 
 - name: Rendering bash file
   template:
@@ -69,7 +81,7 @@
     mode: 0744
   with_items:
     - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
-    - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log.sh" }
+    - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log_{{ mysql_port }}.sh" }
     - { src: 'asynchronous_connection_failover.sh.j2', dest: "{{ shelldir }}/asynchronous_connection_failover.sh" }
 
 - name: Auto config my.cnf
@@ -83,7 +95,7 @@
 
 - name: Modify read_only parameter in my.cnf
   replace:
-    path: "{{ etcdir }}/my.cnf"
+    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
     regexp: "{{ item.original }}"
     replace: "{{ item.change }}"
   with_items:
@@ -97,27 +109,35 @@
 - name: Initial mysql server
   shell: "{{ item }}"
   with_items:
-    - "{{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my.cnf --user=mysql --lower-case-table-names=1 \
+    - "{{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my_{{ mysql_port }}.cnf --user=mysql --lower-case-table-names=1 \
     --initialize-insecure --basedir={{ basedir }} --datadir={{ datadir }}"
     - "{{ basedir }}/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
 
 - name: Clean system's buffer and cache
   shell: "sysctl -w vm.drop_caches=1"
 
+- name: Force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+
 - name: Start mysql server
   systemd:
-    name: mysqld
+    name: mysqld_{{ mysql_port }}
     state: started
 
 - name: Enable mysql server
   systemd:
-    name: mysqld
+    name: mysqld_{{ mysql_port }}
     enabled: yes
+
+- name: Wait for MySql is running
+  pause: seconds=7
 
 - name: Modify root password
   mysql_user:
     login_user: root
     login_password:
+    login_host: localhost
     name: root
     password: "{{ root_password }}"
     update_password: always
@@ -225,6 +245,7 @@
     - { original: 'clone_enable_compression', change: '1' }
     #- { original: 'group_replication_start_on_boot', change: '1' }
     #目前组复制节点被操作系统KILL后再自动启动加入组复制会导致整个组复制无PRIMARY或者其他问题，需要人工介入修复，故不建议随mysql启动
+  when: not mysql57
 
 - name: Modify semisync parameter and clone parameter in my.cnf
   replace:
@@ -237,3 +258,4 @@
     - { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }
     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
     #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
+  when: not mysql57

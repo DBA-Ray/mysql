@@ -4,7 +4,7 @@
 
 #基准运算常量
 
-a=7
+a=6
 
 b=10
 
@@ -52,39 +52,39 @@ auto_increment=`cat /etc/hosts | grep mgr | awk 'END{print NR}'`
 
 group_replication_member_weight=`expr ${incre_offset} \* $b`
 
-sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my.cnf
+sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my.cnf
+sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 if [ "{{ ansible_hostname }}" == mgr1 ]
 
 then
 
-sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 80|g' {{ etcdir }}/my.cnf
+sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 80|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 else
 
-sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 60|g' {{ etcdir }}/my.cnf
+sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 60|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 fi
 
-#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my.cnf
+#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 #by innodb_dedicated_server
 
-sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my.cnf
+sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my.cnf
+sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 echo $user_whitelist > /tmp/user_whitelist.txt
 
@@ -92,8 +92,8 @@ if [ {{ mutli_primary }} == True ]
 
 then
 
-sed -i 's/auto_increment_offset = 1/auto_increment_offset = '"${incre_offset}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/auto_increment_offset = 1/auto_increment_offset = '"${incre_offset}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-sed -i 's/auto_increment_increment = 1/auto_increment_increment = '"${auto_increment}"'/g' {{ etcdir }}/my.cnf
+sed -i 's/auto_increment_increment = 1/auto_increment_increment = '"${auto_increment}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 fi
