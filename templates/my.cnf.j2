@@ -106,7 +106,7 @@
 # thread optimization
   thread_cache_size = {{ thread_cache_size }} #default value: 8 + (max_connections / 100) maxvalue: 100
 
-# table缓存优化（建议10倍于max_connections）
+# table缓存优化（最大并发数 * join语句涉及的表的最大个数）
   table_open_cache = 20000
   #table_definition_cache = 20000 #MIN（400 + table_open_cache / 2, 2000）
 
