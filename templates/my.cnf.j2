@@ -70,7 +70,7 @@
   loose-group_replication_enforce_update_everywhere_checks = {{ mutli_primary }} #多主模式的参数
   loose-group_replication_ip_allowlist = 1
   loose-group_replication_transaction_size_limit = 0 #0为不限制,最好是合理设计业务，限制在20M以下
-  loose-group_replication_member_expel_timeout = 3600 #怀疑节点不可用的超时时间，时间到达被驱逐，最大为3600s
+  loose-group_replication_member_expel_timeout = 3600 #从组中排除怀疑失败的成员之前等待的时间（以秒为单位）。在产生怀疑之前的最初 5 秒检测时间不计入该时间。最大为3600s
   loose-group_replication_autorejoin_tries = 3 #每次尝试自动连接间隔5分钟，在被驱逐出组或者到达group_replication_unreachable_majority_timeout的时间触发
   loose-group_replication_unreachable_majority_timeout = 3600 #节点由ONLINE状态进入UNREACHABLE状态后等待的时间,如果仍保持UNREACHABLE，则将节点置为ERROR状态
   loose-group_replication_compression_threshold = 131072 #大于128K的有效负载的事务被压缩，减少网络带宽的压力,必须小于2113929216 bytes（1.965G）的数据包
