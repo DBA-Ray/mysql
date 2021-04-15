@@ -1,13 +1,11 @@
 ---
-# Whether to uninstall the original service and then install it
-whether_uninstall: False
 # Which hosts to deploy
 deploy_hosts: mgr_pro1
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Basic parameters
 group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
-mysql_port: 3012
+mysql_port: 3377
 mysqlx_port: 33770
 max_connections: 2000
 timeout: 3600
@@ -26,7 +24,7 @@ mysql_upgrade_version: mysql-8.0.23-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.23-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-whether_remount_data_disk: True
+whether_remount_data_disk: False
 fstab_src: /dev/vdb1
 install_dir: /data
 package_dir: "{{ install_dir }}/package"

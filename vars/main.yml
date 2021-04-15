@@ -15,7 +15,7 @@ packages:
   - mysql-shell
   - zstd
   - python2-dnf
-  - mysql-community-libs-compat.x86_64
+#  - mysql-community-libs-compat.x86_64
 
 vars_files:
   - secrets.yml

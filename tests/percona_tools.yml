@@ -1,9 +1,0 @@
----
-- hosts: all:!ansible
-  gather_facts: True
-  remote_user: root
-  vars:
-    percona_tools: True # Whether to install percona tools
-    auto_config_pmm: False # Whether to config pmm client connect to pmm server
-  roles:
-    - dba_ray.mysql

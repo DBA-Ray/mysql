@@ -83,15 +83,20 @@
 
 - name: Stop mysql server
   systemd:
-    name: mysqld
+    name: "mysqld_{{ mysql_port }}"
     state: stopped
   when: whether_uninstall
 
-- name: Remove existing mysql directory
+- name: Remove existing mysql data directory and file
   file:
-    path: "{{ datadir }}"
+    path: "{{ item }}"
     state: absent
     remote_src: 'yes'
+  with_items:
+    - "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+    - "{{ datadir }}"
+    - "{{ logdir }}/mysqld_{{ mysql_port }}.log"
+    - "{{ logdir }}/slow_{{ mysql_port }}.log"
   when: whether_uninstall
 
 #- name: upgrade all packages

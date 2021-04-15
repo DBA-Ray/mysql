@@ -14,7 +14,7 @@ fi
 
 b=10 #weight constant
 
-mysql -uroot -p${1} -e "change master to master_user='repl',master_password='${2}',\
+mysql -uroot -p${1} -S {{ socket }} -e "change master to master_user='repl',master_password='${2}',\
 master_host='mgr1',master_auto_position=1,source_connection_auto_failover=1,\
 master_port={{ mysql_port }},master_retry_count=5,master_connect_retry=6 for channel 'mgr_single';"
 
@@ -30,5 +30,5 @@ master_port={{ mysql_port }},master_retry_count=5,master_connect_retry=6 for cha
 
 #done
 
-mysql -uroot -p${1} -e "SELECT asynchronous_connection_failover_add_managed('mgr_single', 'GroupReplication',\
+mysql -uroot -p${1} -S {{ socket }} -e "SELECT asynchronous_connection_failover_add_managed('mgr_single', 'GroupReplication',\
  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'mgr1', {{ mysql_port }}, '', 80, 60);"

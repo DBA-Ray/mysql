@@ -68,6 +68,7 @@
     group: mysql
     mode: 0644
   with_items:
+    - { src: 'mysql.conf.j2', dest: '/usr/lib/tmpfiles.d/mysql.conf' }
     - { src: 'mysqld.service57.j2', dest: '/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service' }
     - { src: 'my.cnf57.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
   when: mysql57
@@ -230,6 +231,20 @@
     login_unix_socket: "{{ socket }}"
     state: present
 
+- name: Add global read only user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: global
+    password: "{{ read_only_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ user_whitelist.stdout }}"
+    priv: "*.*:SELECT"
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
 - name: Set semisync parameter
   mysql_variables:
     login_user: root
@@ -249,7 +264,7 @@
 
 - name: Modify semisync parameter and clone parameter in my.cnf
   replace:
-    path: "{{ etcdir }}/my.cnf"
+    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
     regexp: "{{ item.original }}"
     replace: "{{ item.change }}"
   with_items:

@@ -15,15 +15,6 @@
 - include: initial_slave_monitor.yml
   when: ( is_standalone | default(False) ) and ( slave_monitor_replication | default(False) )
 
-- include: install_tools.yml
-  when: percona_tools | default(False)
-
-- include: auto_pmm.yml
-  when: auto_pmm | default(False)
-
-- include: auto_config_pmm.yml
-  when: auto_config_pmm | default(False)
-
 - include: upgrade_my_cnf.yml
   when: upgrade_my_cnf | default(False)
 
