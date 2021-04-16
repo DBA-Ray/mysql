@@ -24,6 +24,11 @@
     name: "{{ packages }}"
     state: latest
 
+- name: Install pexpect
+  pip:
+    name: pexpect
+    state: latest
+
 - name: Disable kernel hugepage
   shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled;echo never > /sys/kernel/mm/transparent_hugepage/defrag"
 
