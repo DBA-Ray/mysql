@@ -57,6 +57,8 @@
   log_slave_updates = 1
   relay_log = relay
   relay_log_index = relay.index
+  replication_optimize_for_static_plugin_config = on #improve performance for semisynchronous replication
+  replication_sender_observe_commit_only = on #improve performance for semisynchronous replication
 
 # MGR group_replication 变量加上 "loose" ，则可写入 my.cnf 配置文件中。
   plugin-load = group_replication.so;semisync_master.so;semisync_slave.so;mysql_clone.so
