@@ -20,9 +20,9 @@ primary_hostname: mgr1
 # business info
 business_user: ttjb
 # Directory path
-mysql_upgrade_version: mysql-8.0.23-el7-x86_64
+mysql_upgrade_version: mysql-8.0.25-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.23-el7-x86_64
+mysql_version: mysql-8.0.25-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1

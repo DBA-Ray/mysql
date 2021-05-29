@@ -6,12 +6,6 @@
     group: root
     mode: 0744
 
-- name: Set group_replication_start_on_boot=on
-  replace:
-    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-    regexp: 'loose-group_replication_start_on_boot = off'
-    replace: 'loose-group_replication_start_on_boot = on'
-
 - name: Copy the mgr_monitor.sql
   copy: src=mgr_monitor_official.sql dest=/tmp
   when: ansible_hostname == "{{ primary_hostname }}"
