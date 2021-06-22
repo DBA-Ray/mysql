@@ -1,5 +1,5 @@
 ---
-- hosts: slave_monitor
+- hosts: "{{ deploy_hosts }}"
   gather_facts: True
   remote_user: root
   vars:

@@ -1,6 +1,9 @@
 ---
+env: testa
 # Which hosts to deploy
-deploy_hosts: mgr_pro1
+deploy_hosts: "slave_monitor_{{ env }}"
+# primary hostname for mgr
+primary_hostname: "mgr1_{{ env }}"
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Basic parameters
@@ -15,8 +18,6 @@ log_queries_not_using_indexes: 0
 min_examined_row_limit: 0
 sql_mode: ''
 #sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
-# primary hostname for mgr
-primary_hostname: mgr1
 # business info
 business_user: ttjb
 # Directory path
