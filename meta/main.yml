@@ -3,7 +3,7 @@ galaxy_info:
   description: >
                Automatically deploy the latest version of mysql based on local installation files,
                and config mgr architecture and one master and two slave architecture.
-  company: dxz
+  company: Ray
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
