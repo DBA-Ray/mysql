@@ -94,15 +94,6 @@
     state: absent
     remote_src: yes
 
-- name: Modify read_only parameter in my.cnf
-  replace:
-    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-    regexp: "{{ item.original }}"
-    replace: "{{ item.change }}"
-  with_items:
-    - { original: '#read_only = 1', change: 'read_only = 1' }
-  when: is_slave
-
 - name: Obtain user_whitelist
   shell: "cat /tmp/user_whitelist.txt"
   register: user_whitelist
@@ -115,7 +106,10 @@
     - "{{ basedir }}/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
 
 - name: Clean system's buffer and cache
-  shell: "sysctl -w vm.drop_caches=1"
+  sysctl:
+    name: vm.drop_caches
+    value: '1'
+    state: present
 
 - name: Force systemd to reread configs
   systemd:
