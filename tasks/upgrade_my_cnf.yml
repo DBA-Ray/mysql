@@ -24,17 +24,10 @@
     regexp: "{{ item.original }}"
     replace: "{{ item.change }}"
   with_items:
-    - { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
-    - { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
-    - { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }
+#    - { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
+#    - { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
+#    - { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }
     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
-
-- name: Set group_replication_start_on_boot=on
-  replace:
-    path: "{{ etcdir }}/my.cnf"
-    regexp: 'loose-group_replication_start_on_boot = off'
-    replace: 'loose-group_replication_start_on_boot = on'
-  when: is_mgr | default(False)
 
 - name: Rendering bash file
   template:
@@ -67,5 +60,31 @@
 
 - name: Restart mysql server
   systemd:
-    name: mysqld
+    name: "mysqld_{{ mysql_port }}"
     state: restarted
+
+- name: Wait for MySql is running
+  pause: seconds=3
+  when: is_mgr | default(False)
+
+- name: Start group replication
+  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} -e 'start group_replication;'"
+  when: is_mgr | default(False)
+
+- name: Wait for group replication is online
+  pause: seconds=12
+  when: is_mgr | default(False)
+
+- name: Wait the status of mysql group replication is "YES"
+  shell: source /etc/profile;mysql --login-path=mysql_"{{ mysql_port }}" -e 'SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;'|grep MEMBER_STATE|awk '{print $2}'
+  register: MEMBER_STATE
+  when: is_mgr | default(False)
+
+- name: Show the MEMBER_STATE
+  debug:
+    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+  when: is_mgr | default(False)
+
+- name: Check the member status
+  pause: seconds=3
+  when: is_mgr | default(False)

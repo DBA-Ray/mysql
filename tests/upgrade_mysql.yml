@@ -6,9 +6,9 @@
   max_fail_percentage: 20
   vars:
     upgrade_my_cnf: False # Whether to upgrade mysql parameter file
-    is_mgr: False  # Whether to upgrade mysql parameter file for mgr
-    single_primary: on
-    mutli_primary: off
-    upgrade_server: False # Whether to upgrade mysql server
+    single_primary: on # For mysql parameter file
+    mutli_primary: off # For mysql parameter file
+    is_mgr: False  # Whether to roll upgrade or not
+    upgrade_server: True # Whether to upgrade mysql server
   roles:
     - dba_ray.mysql
