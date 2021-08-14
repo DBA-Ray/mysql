@@ -17,10 +17,10 @@
   binlog_rows_query_log_events = 1
 
 # per_thread_buffers
-  join_buffer_size = 256K #处理逻辑是驱动表的一行和非驱动表联合查找，这时就可以将非驱动表放入join_buffer，不需要访问拥有并发保护机制的buffer_pool
-  sort_buffer_size = 256K #执行order by和group by分配，用于存储排序的中间结果，当分配空间大于2M时会使用mmap而不是malloc来进行内存分配，导致效率降低
-  read_rnd_buffer_size = 256K #当thread进行随机扫描数据时会首先扫描该buffer空间以避免更多的物理读
-  read_buffer_size = 256K #当thread进行顺序扫描数据时会首先扫描该buffer空间以避免更多的物理读
+  join_buffer_size = 32M #处理逻辑是驱动表的一行和非驱动表联合查找，这时就可以将非驱动表放入join_buffer，不需要访问拥有并发保护机制的buffer_pool
+  sort_buffer_size = 2M #执行order by和group by分配，用于存储排序的中间结果，当分配空间大于2M时会使用mmap而不是malloc来进行内存分配，导致效率降低
+  read_rnd_buffer_size = 32M #当thread进行随机扫描数据时会首先扫描该buffer空间以避免更多的物理读，放大以使用MRR
+  read_buffer_size = 2M #当thread进行顺序扫描数据时会首先扫描该buffer空间以避免更多的物理读
   binlog_cache_size = 2M #用于在事务期间保存对二进制日志的更改的内存缓冲区的大小
   binlog_stmt_cache_size = 32k #用于在非事务期间保存对二进制日志的更改的内存缓冲区的大小
 
@@ -103,34 +103,42 @@
 
 # 连接数优化
   max_connections = {{ max_connections }}
-  max_connect_errors = 100000
+  max_connect_errors = {{ max_connections * 10 }}
   max_allowed_packet = 1072693248 #必须小于slave_max_allowed_packet的默认值1073741824（1G）
 
 # thread optimization
-  thread_cache_size = {{ thread_cache_size }} #default value: 8 + (max_connections / 100) maxvalue: 100
+  thread_cache_size = {{ max_connections // 100 + 8 }} #default value: 8 + (max_connections / 100) maxvalue: 100
 
-# table缓存优化（建议10倍于max_connections）
-  table_open_cache = 20000
+# table缓存优化（最大并发数 * join语句涉及的表的最大个数）
+  table_open_cache = {{ max_connections * 3 }}
   #table_definition_cache = 20000 #MIN（400 + table_open_cache / 2, 2000）
 
 # 避免MySQL的外部锁定，减少出错几率增强稳定性。
-  skip_external_locking = 1
+  skip_external_locking = 1 
 
 # innodb 优化
   #innodb_dedicated_server = 1
-  innodb_buffer_pool_size = 25G #by innodb_dedicated_server
-  #innodb_buffer_pool_instances = 64
-  innodb_log_file_size = 256M #by innodb_dedicated_server
-  innodb_flush_method = O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
-  innodb_log_files_in_group = 2 #by innodb_dedicated_server
-  innodb_open_files = 20000 #随table_open_cache变化
-  innodb_io_capacity = 5000
-  innodb_io_capacity_max = 50000
+  #innodb_buffer_pool_size = 25G #by innodb_dedicated_server
+  innodb_buffer_pool_size = {{ (ansible_memtotal_mb * 3) // 4096 }}G
+  innodb_buffer_pool_instances = 64
+  innodb_log_file_size = 1G
+  innodb_flush_method = O_DIRECT_NO_FSYNC #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
+  innodb_log_files_in_group = 72 #by innodb_dedicated_server
+  innodb_open_files = {{ max_connections * 3 }} #随table_open_cache变化
+  innodb_io_capacity = {{ innodb_io_capacity }}
+  innodb_io_capacity_max = {{ innodb_io_capacity * 10 }}
   innodb_flush_sync = 0 #To adhere to the I/O rate defined by the innodb_io_capacity setting
+  innodb_flush_neighbors = 0
+  innodb_use_native_aio = ON
   innodb_log_compressed_pages = OFF #固态硬盘可以关闭
-  innodb_read_io_threads = 4
-  innodb_write_io_threads = 4
-  innodb_thread_concurrency = 10 #将其设置为处理器数目加磁盘数之和，对于高并发事务，可以再大些
+  {% if ansible_hostname == "mgr1_{{ env }}" %}
+innodb_read_io_threads = {{ ( ansible_processor_vcpus * 2 ) // 10 }}
+innodb_write_io_threads = {{ ( ansible_processor_vcpus * 8 ) // 10 }}
+  {% else %}
+innodb_read_io_threads = {{ ( ansible_processor_vcpus * 8 ) // 10 }}
+innodb_write_io_threads = {{ ( ansible_processor_vcpus * 2 ) // 10 }}
+  {% endif %}
+  innodb_thread_concurrency = 0
   innodb_monitor_enable = all
 
 # 临时表优化

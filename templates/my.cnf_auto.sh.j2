@@ -4,31 +4,63 @@
 
 #基准运算常量
 
-a=6
+a=8
 
 b=10
 
 c=3
 
-processor=`cat /proc/cpuinfo |grep "processor"|wc -l`
+#processor=`cat /proc/cpuinfo |grep "processor"|wc -l`
 
-innodb_thread_concurrency=`expr $processor \* $c`
+#innodb_thread_concurrency=`expr $processor \* $c`
 
-innodb_read_io_threads=`expr $processor \* $a / $b`
+#sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-innodb_write_io_threads=`expr $processor - $innodb_read_io_threads`
+#innodb_read_io_threads=`expr $processor \* $a / $b`
+
+#innodb_write_io_threads=`expr $processor - $innodb_read_io_threads`
+
+#if [ "{{ ansible_hostname }}" == mgr1_{{ env }} ]
+
+#then
+
+#sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#主成员的选举权重
+
+#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 80|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#else
+
+#sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#副成员的选举权重
+
+#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 60|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#fi
 
 #自动根据memory计算出innodb缓冲池大小
 
 #by innodb_dedicated_server
 
-mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'` 
+#mem=`free -mh|egrep Mem|awk '{print $2}'|awk '{sub(/.$/,"")}1'|awk '{print int($1+0.5)}'` 
 
-innodb_buffer_pool=`expr $mem \* $a / $b`
+#innodb_buffer_pool=`expr $mem \* $a / $b`
+
+#sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 #自动赋值server_id,取IP最后一位
 
 server_id=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'`
+
+sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#自动获取数据库用户默认内网网段白名单和组复制允许网段
 
 d=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $1}'`
 
@@ -40,53 +72,25 @@ f=`ip a|grep {{ ansible_default_ipv4['address'] }}|awk '{print $2}'|tr -d "addr:
 
 whitelist=`echo "$d.$e.$g.0/$f"`
 
+sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
 user_whitelist=`echo "$d.$e.$g.%"`
+
+echo $user_whitelist > /tmp/user_whitelist.txt
+
+#配置组复制成员
 
 group_replication_group_seeds=`cat /etc/hosts|grep mgr|grep {{ env }}|awk '{print $1}'|awk '{print $0":33771"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
 
-incre_offset_tmp=`cat /etc/hostname`
+sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#配置单主或者多主模式下的自增起始值和偏移量
+
+incre_offset_tmp=`echo {{ ansible_hostname }} | awk -F[_] '{print $1}'`
 
 incre_offset=`echo ${incre_offset_tmp: -1}`
 
-auto_increment=`cat /etc/hosts | grep mgr | awk 'END{print NR}'`
-
-group_replication_member_weight=`expr ${incre_offset} \* $b`
-
-sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's/innodb_thread_concurrency = 10/innodb_thread_concurrency = '"${innodb_thread_concurrency}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-if [ "{{ ansible_hostname }}" == mgr1 ]
-
-then
-
-sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 80|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-else
-
-sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '"${innodb_read_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '"${innodb_write_io_threads}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = 60|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-fi
-
-#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-#by innodb_dedicated_server
-
-sed -i 's/innodb_buffer_pool_size = 25G/innodb_buffer_pool_size = '"${innodb_buffer_pool}"'G/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
-
-echo $user_whitelist > /tmp/user_whitelist.txt
+auto_increment=`cat /etc/hosts | grep mgr | grep {{ env }} | awk 'END{print NR}'`
 
 if [ {{ mutli_primary }} == True ]
 
@@ -97,3 +101,9 @@ sed -i 's/auto_increment_offset = 1/auto_increment_offset = '"${incre_offset}"'/
 sed -i 's/auto_increment_increment = 1/auto_increment_increment = '"${auto_increment}"'/g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 fi
+
+#组复制成员各自的选举权重（暂时废弃）
+
+#group_replication_member_weight=`expr ${incre_offset} \* $b`
+
+#sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf

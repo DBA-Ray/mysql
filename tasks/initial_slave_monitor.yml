@@ -5,7 +5,7 @@
     replace: "{{ item.change }}"
   with_items:
     - { original: '#read_only = 1', change: 'read_only = 1' }
-    - { original: 'slave_preserve_commit_order = on', change: 'slave_preserve_commit_order = off' }
+    - { original: 'replica_preserve_commit_order = on', change: 'replica_preserve_commit_order = off' }
 
 - name: Set slave exclusive parameter
   mysql_variables:
@@ -17,10 +17,7 @@
     value: "{{ item.change }}"
   with_items:
     - { original: 'read_only', change: '1' }
-    - { original: 'slave_preserve_commit_order', change: '0' }
-    - { original: 'log_bin', change: '0' }
-    - { original: 'sync_binlog', change: '0' }
-    - { original: 'log_slave_updates', change: '0' }
+    - { original: 'replica_preserve_commit_order', change: '0' }
 
 - name: Config replication for mgr1 without connection failover
   mysql_replication:
