@@ -4,7 +4,7 @@
 
 - name: Enable mysql5.7 repo
   copy: src=mysql-community.repo57 dest=/etc/yum.repos.d/mysql-community.repo
-  when: mysql57 
+  when: mysql57 | default(False)
 
 - name: Install base packages
   yum:

@@ -1,7 +1,7 @@
 - name: Backing up the original my.cnf
   copy:
-    src: "{{ etcdir }}/my.cnf"
-    dest: "{{ etcdir }}/myback.cnf"
+    src: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+    dest: "{{ etcdir }}/my_{{ mysql_port }}back.cnf"
     owner: mysql
     group: mysql
     mode: 0644
@@ -16,11 +16,11 @@
     group: mysql
     mode: 0644
   with_items:
-    - { src: 'my.cnf.j2', dest: "{{ etcdir }}/my.cnf" }
+    - { src: 'my.cnf.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
 
 - name: Modify semisync parameter and clone parameter in my.cnf
   replace:
-    path: "{{ etcdir }}/my.cnf"
+    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
     regexp: "{{ item.original }}"
     replace: "{{ item.change }}"
   with_items:
@@ -50,7 +50,7 @@
 
 - name: Replace LimitNOFILE=42010
   lineinfile:
-    dest: "/usr/lib/systemd/system/mysqld.service"
+    dest: "/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service"
     regexp: "^LimitNOFILE"
     line: "LimitNOFILE = 42010"
 
@@ -60,16 +60,31 @@
 
 - name: Restart mysql server
   systemd:
-    name: mysqld
+    name: mysqld_{{ mysql_port }}
     state: restarted
 
 - name: Wait for MySql is running
-  pause: seconds=7
+  pause: seconds=3
+  when: is_mgr | default(False)
+
+- name: Start group replication
+  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} -e 'start group_replication;'"
+  when: is_mgr | default(False)
+
+- name: Wait for group replication is online
+  pause: seconds=12
   when: is_mgr | default(False)
 
 - name: Wait the status of mysql group replication is "YES"
-  shell: mysql --login-path=mysql_"{{ mysql_port }}" -e "SELECT viable_candidate FROM sys.gr_member_routing_candte_status\G;"|grep viable_candidate|awk '{printf $2}'
-  register: viable_candidate
-  retries: 7
-  until: "{{ viable_candidate.stdout }} == YES"
+  shell: source /etc/profile;mysql --login-path=mysql_"{{ mysql_port }}" -e 'SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;'|grep MEMBER_STATE|awk '{print $2}'
+  register: MEMBER_STATE
+  when: is_mgr | default(False)
+
+- name: Show the MEMBER_STATE
+  debug:
+    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+  when: is_mgr | default(False)
+
+- name: Check the member status
+  pause: seconds=3
   when: is_mgr | default(False)
