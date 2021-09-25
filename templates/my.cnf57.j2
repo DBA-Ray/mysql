@@ -153,7 +153,7 @@
   innodb_lock_wait_timeout = 1 #InnoDB事务在放弃之前等待行锁定的秒数（行锁）
   innodb_rollback_on_timeout = on #开启事务全部回滚
   innodb_numa_interleave = 1         #启用NUMA交错内存策略以分配InnoDB缓冲池
-  large_pages = 1                    #启用大页内存
+  #large_pages = 1                    #启用大页内存
   innodb_online_alter_log_max_size = 1G #指定InnoDB表的在线DDL操作期间使用的临时日志文件大小的上限（超过将失效回滚）
   innodb_stats_persistent_sample_pages = 128 #估计索引列的基数和其他统计信息时要采样的索引页数
   innodb_sort_buffer_size = 67108864 #创建索引时排序缓冲区大小（64MB）
