@@ -121,7 +121,7 @@
   #innodb_dedicated_server = 1
   #innodb_buffer_pool_size = 25G #by innodb_dedicated_server
   innodb_buffer_pool_size = {{ (ansible_memtotal_mb * 7) // 10240 }}G
-  innodb_buffer_pool_instances = 64
+  innodb_buffer_pool_instances = 8
   innodb_log_buffer_size = 1073741824 #写入磁盘上日志文件的缓冲区的大小
   innodb_log_file_size = 1G #by innodb_dedicated_server
   innodb_flush_method = O_DIRECT_NO_FSYNC #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
