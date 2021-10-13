@@ -86,9 +86,11 @@ sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:337
 
 #配置单主或者多主模式下的自增起始值和偏移量
 
-incre_offset_tmp=`echo {{ ansible_hostname }} | awk -F[_] '{print $1}'`
+#incre_offset_tmp=`echo {{ ansible_hostname }} | awk -F[_] '{print $1}'`
 
-incre_offset=`echo ${incre_offset_tmp: -1}`
+#incre_offset=`echo ${incre_offset_tmp: -1}`
+
+incre_offset=`echo {{ ansible_hostname }} | awk -F[_] '{print $1}' | awk '{print substr($1,length($1),1)}`
 
 auto_increment=`cat /etc/hosts | grep mgr | grep {{ env }} | awk 'END{print NR}'`
 
