@@ -56,6 +56,7 @@
   replica_parallel_type = logical_clock
   replica_parallel_workers = 16 #组复制必须每个节点一致
   replica_preserve_commit_order = on #组复制必须开启
+  replica_pending_jobs_size_max = 1073741824
   log_replica_updates = 1
   relay_log = relay
   relay_log_index = relay.index
