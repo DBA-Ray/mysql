@@ -1,5 +1,5 @@
 ---
-env: testa
+env: pro1
 # Which hosts to deploy
 deploy_hosts: "slave_monitor_{{ env }}"
 # primary hostname for mgr
@@ -21,9 +21,9 @@ sql_mode: ''
 # business info
 business_user: example
 # Directory path
-mysql_upgrade_version: mysql-8.0.27-el7-x86_64
+mysql_upgrade_version: mysql-8.0.28-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.27-el7-x86_64
+mysql_version: mysql-8.0.28-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1
