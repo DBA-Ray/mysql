@@ -1,0 +1,42 @@
+- name: Install mysql-router
+  yum:
+    name: mysql-router-community.x86_64
+    state: latest
+
+- name: Create directories for mysql-router
+  file: path={{ item }} state=directory owner=mysqlrouter group=mysqlrouter
+  with_items:
+    - "{{ routerdir}}"
+
+- name: Rendering mysqlrouter service file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mysql
+    group: mysql
+    mode: 0644
+  with_items:
+    - { src: 'mysqlrouter.service.j2', dest: '/usr/lib/systemd/system/mysqlrouter_{{ mysql_port }}.service' }
+
+- name: Force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+
+- name: Case sensitive password string match for bootstrap mysqlrouter
+  expect:
+    command: "mysqlrouter --user=mysqlrouter --bootstrap repl@{{ primary_hostname }}:{{ mysql_port }} --directory {{ routerdir}}/{{ env }} --conf-use-sockets --conf-base-port {{ mysql_port }} --account repl --account-host {{ ansible_default_ipv4.network }}/24"
+    responses:
+      (?i)repl: "{{ mysql_monitor_password }}"
+      (?i)repl: "{{ mysql_monitor_password }}"
+    echo: yes
+  no_log: True
+
+- name: Start mysqlrouter
+  systemd:
+    name: mysqlrouter_{{ mysql_port }}
+    state: started
+
+- name: Enable mysqlrouter
+  systemd:
+    name: mysqlrouter_{{ mysql_port }}
+    enabled: yes

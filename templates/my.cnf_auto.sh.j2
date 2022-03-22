@@ -72,7 +72,7 @@ f=`ip a|grep {{ ansible_default_ipv4['address'] }}|awk '{print $2}'|tr -d "addr:
 
 whitelist=`echo "$d.$e.$g.0/$f"`
 
-sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+#sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 user_whitelist=`echo "$d.$e.$g.%"`
 
@@ -80,7 +80,7 @@ echo $user_whitelist > /tmp/user_whitelist.txt
 
 #配置组复制成员
 
-group_replication_group_seeds=`cat /etc/hosts|grep mgr|grep {{ env }}|awk '{print $1}'|awk '{print $0":33771"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
+group_replication_group_seeds=`cat /etc/hosts|grep mgr|grep {{ env }}|awk '{print $1}'|awk '{print $0":{{ mysql_port }}1"}'|awk BEGIN{RS=EOF}'{gsub(/\n/,",");print}'`
 
 sed -i 's/loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771"/loose-group_replication_group_seeds = '"${group_replication_group_seeds}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
 

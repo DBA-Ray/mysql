@@ -1,3 +1,8 @@
+-- Grant specific permissions for specific users
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'repl'@'%';
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'root'@'localhost';
+GRANT CLONE_ADMIN,BACKUP_ADMIN ON *.* TO 'pmm'@'127.0.0.1';
+
 USE sys;
 
 DELIMITER $$

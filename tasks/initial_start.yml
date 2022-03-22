@@ -128,6 +128,12 @@
 - name: Wait for MySql is running
   pause: seconds=7
 
+- name: Create a symbolic link for "/tmp/mysql.sock"
+  file:
+    src: "{{ datadir }}/mysql.sock"
+    dest: /tmp/mysql.sock
+    state: link
+
 - name: Modify root password
   mysql_user:
     login_user: root
@@ -163,7 +169,7 @@
     password: "{{ root_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    host: "{{ user_whitelist.stdout }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
     priv: '*.*:ALL,GRANT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
@@ -177,7 +183,7 @@
     password: "{{ mysql_monitor_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    host: "{{ user_whitelist.stdout }}"
+    host: "%"
     priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
@@ -205,7 +211,7 @@
     password: "{{ mysql_monitor_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    host: "{{ user_whitelist.stdout }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
     priv: '*.*:REPLICATION SLAVE,SUPER,REPLICATION CLIENT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
@@ -219,7 +225,7 @@
     password: "{{ business_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    host: "{{ user_whitelist.stdout }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
     priv: "{{ business_user }}.*:SELECT,UPDATE,DELETE,INSERT"
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
@@ -233,7 +239,7 @@
     password: "{{ read_only_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    host: "{{ user_whitelist.stdout }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
     priv: "*.*:SELECT"
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
@@ -247,6 +253,12 @@
       (?i)Continue: y
     echo: yes
   no_log: True
+
+- name: Copy the mgr_monitor.sql
+  copy: src=mgr_monitor_official.sql dest=/tmp
+
+- name: Execute mgr_monitor.sql
+  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < /tmp/mgr_monitor_official.sql"
 
 - name: Add logrotate for mysql error log
   template:

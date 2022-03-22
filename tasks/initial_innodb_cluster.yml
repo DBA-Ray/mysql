@@ -1,0 +1,8 @@
+- name: Rendering config_cluster.js.j2
+  template:
+    src: config_cluster.js.j2
+    dest: "{{ shelldir }}/config_cluster.js"
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_hostname == "{{ primary_hostname }}"

@@ -1,9 +1,10 @@
 ---
 env: pro1
 # Which hosts to deploy
-deploy_hosts: "slave_monitor_{{ env }}"
+deploy_hosts: "mgr_{{ env }}"
 # primary hostname for mgr
 primary_hostname: "mgr1_{{ env }}"
+mgr_group: "mgr_{{ env }}"
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Basic parameters
@@ -37,3 +38,4 @@ etcdir: "{{ basedir }}/etc"
 logdir: "{{ basedir }}/log"
 masterdir: "{{ basedir }}/master"
 socket: "{{ datadir }}/mysql.sock"
+routerdir: "{{ install_dir }}/mysqlrouter_{{ mysql_port }}"

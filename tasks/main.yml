@@ -12,6 +12,9 @@
 - include: initial_group_replication.yml
   when: ( is_standalone | default(False) ) and ( mysql_group_replication | default(False) )
 
+- include: initial_innodb_cluster.yml
+  when: ( is_standalone | default(False) ) and ( innodb_cluster | default(False) )
+
 - include: initial_slave_monitor.yml
   when: ( is_standalone | default(False) ) and ( slave_monitor_replication | default(False) )
 
