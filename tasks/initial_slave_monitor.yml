@@ -34,7 +34,7 @@
   when: not asynchronous_connection_failover | default (True)
 
 - name: Config asynchronous_connection_failover
-  shell: "sh -x {{ shelldir }}/asynchronous_connection_failover.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"
+  shell: "sudo sh -x {{ shelldir }}/asynchronous_connection_failover.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"
 
 - name: Start slave status for slaves
   mysql_replication:
@@ -43,3 +43,21 @@
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
     mode: startslave
+
+- name: Get slave status from slaves
+  mysql_replication:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    mode: getslave
+  register: status
+
+- name: Show the status of replicas
+  debug:
+    msg:
+      - "Slave_SQL_Running is:{{ status | json_query(\"Slave_SQL_Running\") }}"
+      - "Slave_IO_Running is: {{ status | json_query(\"Slave_IO_Running\") }}"
+      - "Seconds_Behind_Master is: {{ status | json_query(\"Seconds_Behind_Master\") }}"
+      - "Last_Error is: {{ status | json_query(\"Last_Error\") }}"
+      - "Master_Host is: {{ status | json_query(\"Master_Host\") }}"

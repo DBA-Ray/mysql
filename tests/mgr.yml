@@ -5,9 +5,6 @@
   vars:
     is_standalone: True # Whether to install stand-alone version
     mysql_group_replication: True # Whether to enable group replication
-    # Single-primary or primary
-    mutli_primary: False
-    single_primary: True
     mysql57: False # Whether to install mysql5.7
     whether_uninstall: False # Whether to uninstall the original service and then install it
   roles:

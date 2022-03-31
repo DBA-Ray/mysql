@@ -6,3 +6,21 @@
     group: root
     mode: 0644
   when: ansible_hostname == "{{ primary_hostname }}"
+
+- name: Config innodb cluster
+  shell: "sudo /usr/bin/mysqlsh root@{{ primary_hostname }}:{{ mysql_port }} --password='{{ root_password }}' -f {{ shelldir }}/config_cluster.js"
+  when: ansible_hostname == "{{ primary_hostname }}"
+
+- name: Wait the member status
+  pause: seconds=5
+
+- name: Obtain the member status
+  shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
+  register: MEMBER_STATE
+
+- name: Show the MEMBER_STATE
+  debug:
+    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+
+- name: Check the member status
+  pause: seconds=10

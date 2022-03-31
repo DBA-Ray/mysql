@@ -1,5 +1,5 @@
 ---
-env: pro1
+env: dev1
 # Which hosts to deploy
 deploy_hosts: "mgr_{{ env }}"
 # primary hostname for mgr
@@ -20,7 +20,7 @@ min_examined_row_limit: 0
 sql_mode: ''
 #sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 # business info
-business_user: example
+business_user: hlzd
 # Directory path
 mysql_upgrade_version: mysql-8.0.28-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"

@@ -3,7 +3,7 @@
 # 二进制日志
   log_bin = mysql-bin
   log_bin_index = mysql-bin.index
-  server_id = 1
+  server_id = {{ server_id.stdout }}
   binlog_format = row
   #binlog_row_image = minimal #影响写入速度
   binlog_expire_logs_seconds = 259200
@@ -67,12 +67,10 @@
   plugin-load = group_replication.so;semisync_master.so;semisync_slave.so;mysql_clone.so
   transaction_isolation = READ-COMMITTED
   loose-group_replication_group_name = "{{ group_replication_group_name }}" #组的名字可以随便起,但不能用主机的GTID（为mgr高可用组起一个名字，这个名字一定要是uuid格式的，所有节点一致）
-  loose-group_replication_start_on_boot = off #启动后自动启动组复制。
-  loose-group_replication_bootstrap_group = off #为了避免每次启动自动引导具有相同名称的第二个组,所以设置为OFF。
-  loose-group_replication_local_address = "{{ ansible_default_ipv4.address }}:{{ mysql_port }}1" #写自己主机所在IP（mgr各实例之前都是要进行通信的，这个配置项设置的就是本实例所监听的ip：端口，不是MySQL对外提供服务的端口）
-  loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771" #各mgr实例所监听的ip:端口，所有节点一致
-  loose-group_replication_single_primary_mode = {{ single_primary }} #单主模式的参数
-  loose-group_replication_enforce_update_everywhere_checks = {{ mutli_primary }} #多主模式的参数
+  #loose-group_replication_start_on_boot = off #启动后自动启动组复制。
+  #loose-group_replication_bootstrap_group = off #为了避免每次启动自动引导具有相同名称的第二个组,所以设置为OFF。
+  #loose-group_replication_local_address = "{{ ansible_default_ipv4.address }}:{{ mysql_port }}1" #写自己主机所在IP（mgr各实例之前都是要进行通信的，这个配置项设置的就是本实例所监听的ip：端口，不是MySQL对外提供服务的端口）
+  #loose-group_replication_group_seeds = "172.21.0.4:33771,172.21.0.8:33771,172.21.0.28:33771" #各mgr实例所监听的ip:端口，所有节点一致
   loose-group_replication_ip_allowlist = {{ ansible_default_ipv4.network }}/24
   loose-group_replication_transaction_size_limit = 0 #0为不限制,最好是合理设计业务，限制在20M以下
   loose-group_replication_member_expel_timeout = 3600 #从组中排除怀疑失败的成员之前等待的时间（以秒为单位）。在产生怀疑之前的最初 5 秒检测时间不计入该时间。最大为3600s
@@ -95,7 +93,7 @@
 
 # 启用克隆压缩
  #clone_enable_compression = 1
-  clone_valid_donor_list = '{{ primary_hostname }}:{{ mysql_port }}'
+ #clone_valid_donor_list = '{{ primary_hostname }}:{{ mysql_port }}'
 
 # 开启慢查询
   long_query_time = 0.5

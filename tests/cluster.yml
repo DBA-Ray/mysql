@@ -5,10 +5,7 @@
   vars:
     is_standalone: True # Whether to install stand-alone version
     innodb_cluster: True # Whether to config innodb cluster
-    # Single-primary or primary
-    mutli_primary: False
-    single_primary: True
+    whether_uninstall: True # Whether to uninstall the original service and then install it
     mysql57: False # Whether to install mysql5.7
-    whether_uninstall: False # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

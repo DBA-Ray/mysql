@@ -75,8 +75,8 @@
   pause: seconds=12
   when: is_mgr | default(False)
 
-- name: Wait the status of mysql group replication is "YES"
-  shell: source /etc/profile;mysql --login-path=mysql_"{{ mysql_port }}" -e 'SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;'|grep MEMBER_STATE|awk '{print $2}'
+- name: Obtain the member status
+  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
   register: MEMBER_STATE
   when: is_mgr | default(False)
 
@@ -86,5 +86,5 @@
   when: is_mgr | default(False)
 
 - name: Check the member status
-  pause: seconds=3
+  pause: seconds=5
   when: is_mgr | default(False)

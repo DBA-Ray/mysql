@@ -1,0 +1,1 @@
+SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;

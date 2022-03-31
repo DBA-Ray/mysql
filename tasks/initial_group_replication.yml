@@ -8,3 +8,17 @@
 
 - name: Config group_replication_bootstrap_group
   shell: "sh -x {{ shelldir }}/config_replication_group.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"
+
+- name: Wait the member status
+  pause: seconds=5
+
+- name: Obtain the member status
+  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
+  register: MEMBER_STATE
+
+- name: Show the MEMBER_STATE
+  debug:
+    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+
+- name: Check the member status
+  pause: seconds=10

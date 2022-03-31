@@ -6,23 +6,23 @@
   copy: src=mysql-community.repo57 dest=/etc/yum.repos.d/mysql-community.repo
   when: mysql57 | default(False)
 
-# - name: Install base packages
-#   yum:
-#     name: "{{ packages }}"
-#     state: latest
+- name: Install base packages
+  yum:
+    name: "{{ packages }}"
+    state: latest
 
-# - name: Install pexpect
-#   pip:
-#     name: pexpect
-#     state: latest
+- name: Install pexpect
+  pip:
+    name: pexpect
+    state: latest
 
-# - name: Install the mysql repo
-#   yum:
-#     name: "{{ remote_repo }}"
-#     state: present
-#   register: repo
-#   retries: 7
-#   until: repo is succeeded
+- name: Install the mysql repo
+  yum:
+    name: "{{ remote_repo }}"
+    state: present
+  register: repo
+  retries: 7
+  until: repo is succeeded
 
 - name: Stop mysql server
   systemd:

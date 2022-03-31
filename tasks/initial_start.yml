@@ -9,6 +9,10 @@
     name: mysql
     group: mysql
 
+- name: Register the variable of server_id
+  shell: "sudo echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'"
+  register: server_id
+
 - name: Create directories for mysql
   file: path={{ item }} state=directory owner=mysql group=mysql
   with_items:
@@ -37,6 +41,9 @@
     src: "{{ package_dir }}/{{ mysql_version }}/"
     dest: "{{ basedir }}"
     remote_src: yes
+
+# - name: Chown privileges for volume directories
+#   file: path="{{ basedir }}" owner=mysql group=mysql recurse=yes
 
 - name: Add the mysql execution path to the environment variable
   lineinfile:
@@ -71,7 +78,7 @@
     - { src: 'mysql.conf.j2', dest: '/usr/lib/tmpfiles.d/mysql.conf' }
     - { src: 'mysqld.service57.j2', dest: '/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service' }
     - { src: 'my.cnf57.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
-  when: mysql57
+  when: mysql57 | default(False)
 
 - name: Rendering bash file
   template:
@@ -81,25 +88,25 @@
     group: root
     mode: 0744
   with_items:
-    - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
+    # - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
     - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log_{{ mysql_port }}.sh" }
     - { src: 'asynchronous_connection_failover.sh.j2', dest: "{{ shelldir }}/asynchronous_connection_failover.sh" }
 
-- name: Auto config my.cnf
-  shell: "sh -x {{ etcdir }}/my.cnf_auto.sh"
+# - name: Auto config my.cnf
+#   shell: "sudo sh -x {{ etcdir }}/my.cnf_auto.sh"
 
-- name: Remove my.cnf_auto.sh
-  file:
-    path: "{{ etcdir }}/my.cnf_auto.sh"
-    state: absent
-    remote_src: yes
+# - name: Remove my.cnf_auto.sh
+#   file:
+#     path: "{{ etcdir }}/my.cnf_auto.sh"
+#     state: absent
+#     remote_src: yes
 
-- name: Obtain user_whitelist
-  shell: "cat /tmp/user_whitelist.txt"
-  register: user_whitelist
+# - name: Obtain user_whitelist
+#   shell: "sudo cat /tmp/user_whitelist.txt"
+#   register: user_whitelist
 
 - name: Initial mysql server
-  shell: "{{ item }}"
+  shell: "sudo {{ item }}"
   with_items:
     - "{{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my_{{ mysql_port }}.cnf --user=mysql --lower-case-table-names=1 \
     --initialize-insecure --basedir={{ basedir }} --datadir={{ datadir }}"
@@ -255,10 +262,15 @@
   no_log: True
 
 - name: Copy the mgr_monitor.sql
-  copy: src=mgr_monitor_official.sql dest=/tmp
+  copy: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}/"
+  with_items:
+    - { src: 'mgr_monitor_official.sql', dest: "{{ shelldir }}/" }
+    - { src: 'check.sql', dest: "{{ shelldir }}/" }
 
 - name: Execute mgr_monitor.sql
-  shell: "{{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < /tmp/mgr_monitor_official.sql"
+  shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/mgr_monitor_official.sql"
 
 - name: Add logrotate for mysql error log
   template:

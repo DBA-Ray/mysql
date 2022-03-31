@@ -1,29 +1,31 @@
+var dbPass = "{{ root_password }}"
+var clusterName = "cluster_{{ env }}"
 
-
-
+try {
+  print('Checking the mysql node of InnoDB cluster...\n');
+  shell.connect('root@{{ primary_hostname }}:{{ mysql_port }}', dbPass)
 {% for srv in groups[mgr_group] %}
-dba.checkInstanceConfiguration('root@{{ hostvars[srv]['inventory_hostname_short'] }}:{{ mysql_port }}');
+  dba.checkInstanceConfiguration('root@{{ hostvars[srv]['inventory_hostname_short'] }}:{{ mysql_port }}', {password:dbPass});
 {% endfor %}
-
-var cluster = dba.createCluster('cluster_{{ env }}');
-
-cluster.setupAdminAccount('repl@{{ ansible_default_ipv4.network }}/24',{update:true});
-
-cluster.setupRouterAccount('repl@{{ ansible_default_ipv4.network }}/24',{update:true});
-
+  print('Setting up InnoDB cluster...\n');
+  var cluster = dba.createCluster(clusterName);
+  cluster.setupAdminAccount('admin@{{ ansible_default_ipv4.network }}/24',{update:false, password:dbPass});
+  cluster.setupRouterAccount('router@{{ ansible_default_ipv4.network }}/24',{update:false, password:dbPass});
+  print('Adding instances to the cluster.');
 {% for srv in groups[mgr_group] %}
 {% if  hostvars[srv]['inventory_hostname_short'] != primary_hostname %}
-cluster.addInstance('root@{{ hostvars[srv]['inventory_hostname_short'] }}:{{ mysql_port }}');
+  cluster.addInstance('root@{{ hostvars[srv]['inventory_hostname_short'] }}:{{ mysql_port }}', {password:dbPass ,recoveryMethod: 'clone'});
+  print('.');
 {% endif %}
 {% endfor %}
+  print('.\nInstances successfully added to the cluster.');
+  print('\nInnoDB cluster deployed successfully.\n');
+} catch(e) {
+  print('\nThe InnoDB cluster could not be created.\n\nError: ' + e.message + '\n');
+}
 
-var cluster=dba.getCluster();
+// var cluster=dba.getCluster();
 
-cluster.status();
+// cluster.status();
 
-// Config innodb cluster
-{% for srv in groups[mgr_group] %}
-{% if  hostvars[srv]['inventory_hostname_short'] == primary_hostname %}
-// mysqlsh root@{{ hostvars[srv]['inventory_hostname_short'] }}:{{ mysql_port }} -f {{ shelldir }}/config_cluster.js
-{% endif %}
-{% endfor %}
+// cluster.listRouters()

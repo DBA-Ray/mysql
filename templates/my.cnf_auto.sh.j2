@@ -4,11 +4,11 @@
 
 #基准运算常量
 
-a=8
+# a=8
 
-b=10
+# b=10
 
-c=3
+# c=3
 
 #processor=`cat /proc/cpuinfo |grep "processor"|wc -l`
 
@@ -56,27 +56,27 @@ c=3
 
 #自动赋值server_id,取IP最后一位
 
-server_id=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'`
+# server_id=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'`
 
-sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
+# sed -i 's/server_id = 1/server_id = '"${server_id}"'/' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
 #自动获取数据库用户默认内网网段白名单和组复制允许网段
 
-d=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $1}'`
+# d=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $1}'`
 
-e=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $2}'`
+# e=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $2}'`
 
-g=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $3}'`
+# g=`echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $3}'`
 
-f=`ip a|grep {{ ansible_default_ipv4['address'] }}|awk '{print $2}'|tr -d "addr:"|sed 's/.*\(..\)$/\1/'`
+# f=`ip a|grep {{ ansible_default_ipv4['address'] }}|awk '{print $2}'|tr -d "addr:"|sed 's/.*\(..\)$/\1/'`
 
-whitelist=`echo "$d.$e.$g.0/$f"`
+# whitelist=`echo "$d.$e.$g.0/$f"`
 
-#sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+# sed -i 's|loose-group_replication_ip_allowlist = 1|loose-group_replication_ip_allowlist = '"${whitelist}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
 
-user_whitelist=`echo "$d.$e.$g.%"`
+# user_whitelist=`echo "$d.$e.$g.%"`
 
-echo $user_whitelist > /tmp/user_whitelist.txt
+# echo $user_whitelist > /tmp/user_whitelist.txt
 
 #配置组复制成员
 

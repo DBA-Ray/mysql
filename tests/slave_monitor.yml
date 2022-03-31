@@ -4,8 +4,6 @@
   remote_user: root
   vars:
     is_standalone: True # Whether to install stand-alone version
-    mutli_primary: False # Default value for is_standalone
-    single_primary: True # Default value for is_standalone
     slave_monitor_replication: True # Whether to enable asynchronous replication instances for MGR
     asynchronous_connection_failover: True # Whether to enable asynchronous connection failover
     mysql57: False # Whether to install mysql5.7
