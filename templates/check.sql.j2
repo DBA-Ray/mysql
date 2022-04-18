@@ -1,0 +1,7 @@
+REVOKE SELECT ON `mysql`.* FROM `global`@`"{{ ansible_default_ipv4.network }}/24"`;
+REVOKE SELECT ON `mysql_innodb_cluster_metadata`.* FROM `global`@`"{{ ansible_default_ipv4.network }}/24"`;
+REVOKE SELECT ON `performance_schema`.* FROM `global`@`"{{ ansible_default_ipv4.network }}/24"`;
+REVOKE SELECT ON `sys`.* FROM `global`@`"{{ ansible_default_ipv4.network }}/24"`;
+FLUSH PRIVILEGES;
+
+SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;

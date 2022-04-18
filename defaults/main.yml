@@ -1,7 +1,7 @@
 ---
 env: dev1
 # Which hosts to deploy
-deploy_hosts: "mgr_{{ env }}"
+deploy_hosts: "delay_replica1_{{ env }}"
 # primary hostname for mgr
 primary_hostname: "mgr1_{{ env }}"
 mgr_group: "mgr_{{ env }}"
@@ -9,8 +9,8 @@ mgr_group: "mgr_{{ env }}"
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Basic parameters
 group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
-mysql_port: 3377
-mysqlx_port: 33770
+mysql_port: 3324
+mysqlx_port: 33240
 max_connections: 2000
 innodb_io_capacity: 10000
 timeout: 28800

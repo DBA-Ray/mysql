@@ -1,23 +1,23 @@
-- name: Modify read_only parameter in my.cnf
-  replace:
-    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-    regexp: "{{ item.original }}"
-    replace: "{{ item.change }}"
-  with_items:
-    - { original: '#read_only = 1', change: 'read_only = 1' }
-    - { original: 'replica_preserve_commit_order = on', change: 'replica_preserve_commit_order = off' }
+# - name: Modify read_only parameter in my.cnf
+#   replace:
+#     path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+#     regexp: "{{ item.original }}"
+#     replace: "{{ item.change }}"
+#   with_items:
+#     - { original: '#read_only = 1', change: 'read_only = 1' }
+#     - { original: 'replica_preserve_commit_order = on', change: 'replica_preserve_commit_order = off' }
 
-- name: Set slave exclusive parameter
-  mysql_variables:
-    login_user: root
-    login_password: "{{ root_password }}"
-    login_port: "{{ mysql_port }}"
-    login_unix_socket: "{{ socket }}"
-    variable: "{{ item.original }}"
-    value: "{{ item.change }}"
-  with_items:
-    - { original: 'read_only', change: '1' }
-    - { original: 'replica_preserve_commit_order', change: '0' }
+# - name: Set slave exclusive parameter
+#   mysql_variables:
+#     login_user: root
+#     login_password: "{{ root_password }}"
+#     login_port: "{{ mysql_port }}"
+#     login_unix_socket: "{{ socket }}"
+#     variable: "{{ item.original }}"
+#     value: "{{ item.change }}"
+#   with_items:
+#     - { original: 'read_only', change: '1' }
+#     - { original: 'replica_preserve_commit_order', change: '0' }
 
 - name: Config replication for mgr1 without connection failover
   mysql_replication:

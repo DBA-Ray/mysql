@@ -267,7 +267,16 @@
     dest: "{{ item.dest }}/"
   with_items:
     - { src: 'mgr_monitor_official.sql', dest: "{{ shelldir }}/" }
-    - { src: 'check.sql', dest: "{{ shelldir }}/" }
+
+- name: Rendering the check.sql
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: 'check.sql.j2', dest: "{{ shelldir }}/check.sql" }
 
 - name: Execute mgr_monitor.sql
   shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/mgr_monitor_official.sql"
@@ -280,15 +289,15 @@
     group: root
     mode: 0640
   with_items:
-    - { src: 'mysql.j2', dest: '/etc/logrotate.d/mysql'}
+    - { src: 'mysql.j2', dest: '/etc/logrotate.d/mysql_{{ mysql_port }}'}
 
 - name: Add the job of logrotate for msyql error log
   cron:
-    name: "logrotate"
+    name: "mysql_{{ mysql_port }} logrotate"
     weekday: "6"
     minute: "55"
     hour: "23"
-    job: "/usr/sbin/logrotate -vf -s /var/lib/logrotate/logrotate.status /etc/logrotate.d/mysql > /dev/null 2>&1 &"
+    job: "/usr/sbin/logrotate -vf -s /var/lib/logrotate/logrotate.status /etc/logrotate.d/mysql_{{ mysql_port }} > /dev/null 2>&1 &"
 
 - name: Set semisync parameter
   mysql_variables:

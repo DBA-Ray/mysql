@@ -52,7 +52,13 @@
   enforce_gtid_consistency = true
   master_info_repository = TABLE
   relay_log_info_repository = TABLE
- #read_only = 1
+{% if delay_replication == True or slave_monitor_replication == True %}
+  read_only = 1
+  replica_preserve_commit_order = off #组复制必须开启
+{% else %}
+  read_only = 0
+  replica_preserve_commit_order = on #组复制必须开启
+{% endif %}
   replica_parallel_type = logical_clock
   replica_parallel_workers = 16 #组复制必须每个节点一致
   replica_preserve_commit_order = on #组复制必须开启
@@ -64,7 +70,11 @@
   replication_sender_observe_commit_only = on #improve performance for semisynchronous replication
 
 # MGR group_replication 变量加上 "loose" ，则可写入 my.cnf 配置文件中。
+{% if delay_replication == True or slave_monitor_replication == True %}
+  plugin-load = semisync_master.so;semisync_slave.so;mysql_clone.so
+{% else %}
   plugin-load = group_replication.so;semisync_master.so;semisync_slave.so;mysql_clone.so
+{% endif %}
   transaction_isolation = READ-COMMITTED
   loose-group_replication_group_name = "{{ group_replication_group_name }}" #组的名字可以随便起,但不能用主机的GTID（为mgr高可用组起一个名字，这个名字一定要是uuid格式的，所有节点一致）
   #loose-group_replication_start_on_boot = off #启动后自动启动组复制。
@@ -107,6 +117,9 @@
 # 是否记录管理语句
   log_slow_admin_statements = 0
 
+# 开启回收部分权限
+  partial_revokes = 1
+
 # 连接数优化
   max_connections = {{ max_connections }}
   max_connect_errors = {{ max_connections * 10 }} #允许同一主机连接请求失败最大值（超过之后mysql会阻止这台主机后续所有请求）
@@ -125,12 +138,17 @@
 # innodb 优化
   innodb_dedicated_server = 1
   #innodb_buffer_pool_size = 25G #by innodb_dedicated_server
+{% if delay_replication == True%}
+  innodb_buffer_pool_size = {{ (ansible_memtotal_mb * 7) // 40960 }}G
+  innodb_log_files_in_group = 2 #by innodb_dedicated_server
+{% else %}
   innodb_buffer_pool_size = {{ (ansible_memtotal_mb * 7) // 10240 }}G
+  #innodb_log_files_in_group = 2 #by innodb_dedicated_server
+{% endif %}
   innodb_buffer_pool_instances = 8
   innodb_log_buffer_size = 1073741824 #写入磁盘上日志文件的缓冲区的大小
   #innodb_log_file_size = 1G #by innodb_dedicated_server
   #innodb_flush_method = O_DIRECT_NO_FSYNC #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
-  #innodb_log_files_in_group = 2 #by innodb_dedicated_server
   innodb_open_files = {{ max_connections * 3 }} #保持打开ibd文件最大值，随table_open_cache变化
   innodb_io_capacity = {{ innodb_io_capacity }}  #InnoDB后台任务IOPS
   innodb_io_capacity_max = {{ innodb_io_capacity * 10 }} #InnoDB后台任务IOPS最大值
