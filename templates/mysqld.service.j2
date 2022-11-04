@@ -24,7 +24,7 @@ ExecStart=/usr/bin/numactl --interleave=all {{ basedir }}/bin/mysqld --defaults-
 EnvironmentFile=-/etc/sysconfig/mysql
 
 # Sets open_files_limit
-LimitNOFILE = 42010
+LimitNOFILE = 70010
 
 Restart=on-failure
 

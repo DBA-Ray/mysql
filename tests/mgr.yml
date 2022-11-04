@@ -4,8 +4,8 @@
   remote_user: root
   vars:
     is_standalone: True # Whether to install stand-alone version
-    mysql_group_replication: True # Whether to enable group replication
+    mysql_group_replication: False # Whether to enable group replication
     mysql57: False # Whether to install mysql5.7
-    whether_uninstall: False # Whether to uninstall the original service and then install it
+    whether_uninstall: True # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

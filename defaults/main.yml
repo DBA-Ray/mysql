@@ -1,30 +1,33 @@
 ---
 env: dev1
 # Which hosts to deploy
-deploy_hosts: "delay_replica1_{{ env }}"
+deploy_hosts: "slave1_{{ env }}"
 # primary hostname for mgr
+mutli_primary: false
 primary_hostname: "mgr1_{{ env }}"
 mgr_group: "mgr_{{ env }}"
 # Repo info
 remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 # Basic parameters
-group_replication_group_name: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
-mysql_port: 3324
-mysqlx_port: 33240
-max_connections: 2000
+group_replication_group_name: d8d31564-b93c-11ec-a0bd-fa163eba97fa
+mysql_port: 3377
+mysqlx_port: 33770
+max_connections: 10000
 innodb_io_capacity: 10000
 timeout: 28800
 tmp_size: 1073741824
 log_queries_not_using_indexes: 0
 min_examined_row_limit: 0
 sql_mode: ''
+delay_replication: false
+slave_monitor_replication: false
 #sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 # business info
 business_user: hlzd
 # Directory path
-mysql_upgrade_version: mysql-8.0.28-el7-x86_64
+mysql_upgrade_version: mysql-8.0.31-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.28-el7-x86_64
+mysql_version: mysql-8.0.31-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1
@@ -39,3 +42,31 @@ logdir: "{{ basedir }}/log"
 masterdir: "{{ basedir }}/master"
 socket: "{{ datadir }}/mysql.sock"
 routerdir: "{{ install_dir }}/mysqlrouter_{{ mysql_port }}"
+# defaults file for manage_mysql
+# basic
+socket: /data/mysql/data_{{ mysql_port }}/mysql.sock
+# mysql_info.yml
+# Allowable values are version, databases, settings, users, slave_status, slave_hosts, master_status, engines.
+# By default, collects all subsets.
+filter:
+  - version
+  - databases
+schema: dxz # Specify which schema size to view
+# manage_variables.yml
+option_value:
+  # - { option: 'loose-group_replication_exit_state_action', value: 'OFFLINE_MODE' }
+  # - { option: 'loose-group_replication_member_expel_timeout', value: '5' }
+  # - { option: 'loose-group_replication_autorejoin_tries', value: '1' }
+  # - { option: 'loose-group_replication_unreachable_majority_timeout', value: '3' }
+  # - { option: 'loose-group_replication_transaction_size_limit', value: '209715200' }
+  - { option: 'group_replication_exit_state_action', value: 'OFFLINE_MODE' }
+  - { option: 'group_replication_member_expel_timeout', value: '5' }
+  - { option: 'group_replication_autorejoin_tries', value: '1' }
+  - { option: 'group_replication_unreachable_majority_timeout', value: '3' }
+  - { option: 'group_replication_transaction_size_limit', value: '209715200' }
+  # - { option: 'replica_preserve_commit_order', value: '1' }
+  #  - { option: 'replica_parallel_workers', value: '128' }
+# manage_replication.yml
+master_host: master
+master_port: 3377
+master_user: repl

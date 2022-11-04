@@ -88,18 +88,18 @@
     group: root
     mode: 0744
   with_items:
-    # - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
+    - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
     - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log_{{ mysql_port }}.sh" }
     - { src: 'asynchronous_connection_failover.sh.j2', dest: "{{ shelldir }}/asynchronous_connection_failover.sh" }
 
-# - name: Auto config my.cnf
-#   shell: "sudo sh -x {{ etcdir }}/my.cnf_auto.sh"
+- name: Auto config my.cnf
+  shell: "sudo sh -x {{ etcdir }}/my.cnf_auto.sh"
 
-# - name: Remove my.cnf_auto.sh
-#   file:
-#     path: "{{ etcdir }}/my.cnf_auto.sh"
-#     state: absent
-#     remote_src: yes
+- name: Remove my.cnf_auto.sh
+  file:
+    path: "{{ etcdir }}/my.cnf_auto.sh"
+    state: absent
+    remote_src: yes
 
 # - name: Obtain user_whitelist
 #   shell: "sudo cat /tmp/user_whitelist.txt"
@@ -191,7 +191,7 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: "%"
-    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT'
+    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
@@ -299,32 +299,32 @@
     hour: "23"
     job: "/usr/sbin/logrotate -vf -s /var/lib/logrotate/logrotate.status /etc/logrotate.d/mysql_{{ mysql_port }} > /dev/null 2>&1 &"
 
-- name: Set semisync parameter
-  mysql_variables:
-    login_user: root
-    login_password: "{{ root_password }}"
-    login_port: "{{ mysql_port }}"
-    login_unix_socket: "{{ socket }}"
-    variable: "{{ item.original }}"
-    value: "{{ item.change }}"
-  with_items:
-    #- { original: 'rpl_semi_sync_slave_enabled', change: '1' }
-    #- { original: 'rpl_semi_sync_master_enabled', change: '1' }
-    #- { original: 'rpl_semi_sync_master_timeout', change: '500' } #兼容8.0.25
-    - { original: 'clone_enable_compression', change: '1' }
-    #- { original: 'group_replication_start_on_boot', change: '1' }
-    #目前组复制节点被操作系统KILL后再自动启动加入组复制会导致整个组复制无PRIMARY或者其他问题，需要人工介入修复，故不建议随mysql启动
-  when: not mysql57
+# - name: Set some parameters
+#   mysql_variables:
+#     login_user: root
+#     login_password: "{{ root_password }}"
+#     login_port: "{{ mysql_port }}"
+#     login_unix_socket: "{{ socket }}"
+#     variable: "{{ item.original }}"
+#     value: "{{ item.change }}"
+#   with_items:
+#     #- { original: 'rpl_semi_sync_slave_enabled', change: '1' }
+#     #- { original: 'rpl_semi_sync_master_enabled', change: '1' }
+#     #- { original: 'rpl_semi_sync_master_timeout', change: '500' } #兼容8.0.25
+#     - { original: 'clone_enable_compression', change: '1' }
+#     #- { original: 'group_replication_start_on_boot', change: '1' }
+#     #目前组复制节点被操作系统KILL后再自动启动加入组复制会导致整个组复制无PRIMARY或者其他问题，需要人工介入修复，故不建议随mysql启动
+#   when: not mysql57
 
-- name: Modify semisync parameter and clone parameter in my.cnf
-  replace:
-    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-    regexp: "{{ item.original }}"
-    replace: "{{ item.change }}"
-  with_items:
-    #- { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
-    #- { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
-    #- { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }#兼容8.0.25
-    - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
-    #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
-  when: not mysql57
+# - name: Modify semisync parameter and clone parameter in my.cnf
+#   replace:
+#     path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+#     regexp: "{{ item.original }}"
+#     replace: "{{ item.change }}"
+#   with_items:
+#     #- { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
+#     #- { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
+#     #- { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }#兼容8.0.25
+#     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
+#     #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
+#   when: not mysql57

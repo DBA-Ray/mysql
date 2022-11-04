@@ -1,0 +1,28 @@
+# Gather information about MySQL servers
+- name: Get MySQL version with credentials
+  mysql_info:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: "{{ socket }}"
+    filter: version
+  register: mysql_version
+
+- name: Get MySQL version for human read
+  debug:
+    msg: "The MySQL version of {{ ansible_hostname }} is: {{ mysql_version | json_query(\"version.*\") | join ('-') }}"
+
+- name: Get the size of MySQL database  with credentials
+  mysql_info:
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: "{{ socket }}"
+    filter: databases
+  register: database_size
+
+- name: Get the size of MySQL database for human read
+  debug:
+    msg: "The size of {{ schema }} is: {{ database_size | json_query(schema_size) }}"
+  vars:
+    schema_size: "databases.{{ schema }}.size"

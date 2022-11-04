@@ -1,0 +1,13 @@
+---
+- hosts: "mgr_{{ env }}"
+  gather_facts: True
+  remote_user: root
+  vars:
+    gather_information: True
+    manage_mysql: True
+  roles:
+    - dba_ray.mysql
+# tags:
+#    - present for add or modify parameters
+#    - absent for delete parameters
+#    - show_variables only for view mysql variables
