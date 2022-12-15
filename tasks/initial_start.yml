@@ -281,7 +281,7 @@
 - name: Execute mgr_monitor.sql
   shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/mgr_monitor_official.sql"
 
-- name: Add logrotate for mysql error log
+- name: Rendering logrotate for mysql error log
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

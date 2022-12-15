@@ -28,17 +28,17 @@
   with_items: "{{ option_value }}"
   tags: present
 
-# - name: Add or modify patameters for my.cnf
-#   ini_file:
-#     path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-#     section: mysqld
-#     option: "{{ item.option | string }}"
-#     value: "{{ item.value | string }}"
-#     state: present
-#     mode: '0644'
-#     backup: yes
-#   with_items: "{{ option_value }}"
-#   tags: present
+- name: Add or modify patameters for my.cnf
+  ini_file:
+    path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+    section: mysqld
+    option: "{{ item.option | string }}"
+    value: "{{ item.value | string }}"
+    state: present
+    mode: '0644'
+    backup: yes
+  with_items: "{{ option_value }}"
+  tags: present
 
 - name: Delete patameters for my.cnf
   ini_file:

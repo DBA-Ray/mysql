@@ -1,7 +1,7 @@
 ---
 env: dev1
 # Which hosts to deploy
-deploy_hosts: "slave1_{{ env }}"
+deploy_hosts: "mgr_{{ env }}"
 # primary hostname for mgr
 mutli_primary: false
 primary_hostname: "mgr1_{{ env }}"
@@ -25,9 +25,9 @@ slave_monitor_replication: false
 # business info
 business_user: hlzd
 # Directory path
-mysql_upgrade_version: mysql-8.0.31-el7-x86_64
+mysql_upgrade_version: mysql-8.0.28-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.31-el7-x86_64
+mysql_version: mysql-8.0.28-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1
