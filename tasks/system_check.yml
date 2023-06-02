@@ -16,13 +16,13 @@
     name: pexpect
     state: latest
 
-- name: Install the mysql repo
-  yum:
-    name: "{{ remote_repo }}"
-    state: present
-  register: repo
-  retries: 7
-  until: repo is succeeded
+#- name: Install the mysql repo
+#  yum:
+#    name: "{{ remote_repo }}"
+#    state: present
+#  register: repo
+#  retries: 7
+#  until: repo is succeeded
 
 - name: Stop mysql server
   systemd:
