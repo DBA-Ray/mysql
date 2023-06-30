@@ -42,6 +42,16 @@
     dest: "{{ basedir }}"
     remote_src: yes
 
+- name: Copy proxysql_binlog_reader package
+  copy:
+    src: "{{ proxysql_binlog_reader_package }}"
+    dest: "{{ package_dir }}"
+
+- name: Install proxysql_binlog_reader
+  yum:
+    name: "{{ package_dir }}/{{ proxysql_binlog_reader_package }}"
+    state: present
+
 # - name: Chown privileges for volume directories
 #   file: path="{{ basedir }}" owner=mysql group=mysql recurse=yes
 
@@ -328,3 +338,7 @@
 #     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
 #     #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
 #   when: not mysql57
+
+- name: Start proxysql_binlog_reader
+  shell: "proxysql_binlog_reader -h 127.0.0.1 -u repl -p\'{{ mysql_monitor_password }}\' -P {{ mysql_port }} \
+  -l {{ proxysql_binlog_reader_port }} -L {{ logdir }}/binlog_reader_m{{ mysql_port }}_r{{ proxysql_binlog_reader_port }}.log"

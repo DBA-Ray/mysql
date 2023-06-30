@@ -21,9 +21,17 @@ CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_r
 SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION;\
 SET GLOBAL group_replication_bootstrap_group=OFF;"
 
+sleep 5
+
+{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "REVOKE SELECT ON mysql.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
+REVOKE SELECT ON mysql_innodb_cluster_metadata.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
+REVOKE SELECT ON performance_schema.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
+REVOKE SELECT ON sys.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
+FLUSH PRIVILEGES;"
+
 else
 
-sleep 30
+sleep 20
 
 {{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl',\
 MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"

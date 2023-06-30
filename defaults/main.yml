@@ -29,6 +29,8 @@ mysql_upgrade_version: mysql-8.0.33-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.33-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
+proxysql_binlog_reader_package: proxysql-mysqlbinlog-2.1-5-g7f50bd0-centos7.x86_64.rpm
+proxysql_binlog_reader_port: 3307
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1
 install_dir: /data
