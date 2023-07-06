@@ -12,12 +12,19 @@
   #binlog_row_image = minimal #影响写入速度
   binlog_expire_logs_seconds = 259200
   binlog_transaction_dependency_tracking = WRITESET
+  binlog_transaction_dependency_history_size = 1000000
   binlog_order_commits = 0
   binlog_checksum = CRC32
   binlog_transaction_compression = 0
   binlog_transaction_compression_level_zstd = 7 #（1-22）
   transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。
-  sync_binlog = 1 #最安全，最多丢失一个事务，需要SSD磁盘，ext4格式
+{% if performance_or_safety == performance %}
+  sync_binlog = 1000 #每写入1000次系统缓存就执行一次写入磁盘并刷新的操作，会有数据丢失的风险。
+  innodb_flush_log_at_trx_commit = 2 #事务提交时，把事务日志从缓存区写到日志文件中，日志文件会每秒写入到磁盘，如果写入前系统崩溃，就会导致最后1秒的日志丢失。
+{% else %}
+  sync_binlog = 1 #事务提交后，将二进制日志文件写入磁盘并立即刷新，相当于同步写入磁盘，不经过系统缓存。
+  innodb_flush_log_at_trx_commit = 1 #事务提交时，把事务日志从缓存区写到日志文件中，并且立刻写入到磁盘上。
+{% endif %}
   binlog_rows_query_log_events = 1
   sql_require_primary_key = 1 #检查表中是否有主键
 
