@@ -7,7 +7,7 @@ mutli_primary: false
 primary_hostname: "mgr1_{{ env }}"
 mgr_group: "mgr_{{ env }}"
 # Repo info
-remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+remote_repo: https://dev.mysql.com/get/mysql80-community-release-el7-9.noarch.rpm
 # Basic parameters
 group_replication_group_name: d8d31564-b93c-11ec-a0bd-fa163eba97fa
 mysql_port: 3377
@@ -25,13 +25,19 @@ performance_or_safety: performance
 #sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 # business info
 business_user: actest
-# Directory path
+#Version
+mysql57: False
+mysql80: true
 mysql_upgrade_version: mysql-8.0.33-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.0.33-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
+mysql81: False
+enable_yum: True
+mysql_community_server: mysql-community-server-8.0.34-1.el7.x86_64
 proxysql_binlog_reader_package: proxysql-mysqlbinlog-2.1-5-g7f50bd0-centos7.x86_64.rpm
 proxysql_binlog_reader_port: 3307
+# Directory path
 whether_remount_data_disk: False
 fstab_src: /dev/vdb1
 install_dir: /data

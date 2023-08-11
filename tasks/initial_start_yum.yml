@@ -1,0 +1,330 @@
+#initial and start mysql server
+- name: Ensure group "mysql" exists
+  group:
+    name: mysql
+    state: present
+
+- name: Ensure the user "mysql" exists
+  user:
+    name: mysql
+    group: mysql
+
+- name: Register the variable of server_id
+  shell: "sudo echo {{ ansible_default_ipv4['address'] }} | awk -F'.' '{print $4}'"
+  register: server_id
+
+- name: Create directories for mysql
+  file: path={{ item }} state=directory owner=mysql group=mysql
+  with_items:
+    - "{{ package_dir }}"
+    - "{{ shelldir }}"
+    - "{{ monitordir }}"
+    - "{{ basedir }}"
+    - "{{ datadir }}"
+    - "{{ etcdir }}"
+    - "{{ logdir }}"
+    - "{{ masterdir }}"
+
+- name: Install the mysql server
+  yum:
+    name: ["{{ mysql_community_server }}", "mysql-shell"]
+    state: latest
+  register: result
+  retries: 7
+  until: result is succeeded
+
+- name: Copy proxysql_binlog_reader package
+  copy:
+    src: "{{ proxysql_binlog_reader_package }}"
+    dest: "{{ package_dir }}"
+
+- name: Install proxysql_binlog_reader
+  yum:
+    name: "{{ package_dir }}/{{ proxysql_binlog_reader_package }}"
+    state: present
+
+# - name: Chown privileges for volume directories
+#   file: path="{{ basedir }}" owner=mysql group=mysql recurse=yes
+
+- name: Add the mysql execution path to the environment variable
+  lineinfile:
+    path: /etc/profile
+    line: export PATH=/usr/bin:$PATH
+    insertafter: EOF
+    state: present
+
+- name: Source profile
+  shell: "source /etc/profile"
+
+- name: Rendering mysql parameter file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mysql
+    group: mysql
+    mode: 0644
+  with_items:
+    # - { src: 'mysql.conf.j2', dest: '/usr/lib/tmpfiles.d/mysql.conf' }
+    - { src: 'mysqld.service81.j2', dest: '/usr/lib/systemd/system/mysqld_{{ mysql_port }}.service' }
+    - { src: 'my.cnf_yum.j2', dest: "{{ etcdir }}/my_{{ mysql_port }}.cnf" }
+
+- name: Rendering bash file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0744
+  with_items:
+    - { src: 'my.cnf_auto.sh.j2', dest: "{{ etcdir }}/my.cnf_auto.sh" }
+    - { src: 'see_log.sh.j2', dest: "{{ shelldir }}/see_log_{{ mysql_port }}.sh" }
+    - { src: 'asynchronous_connection_failover.sh.j2', dest: "{{ shelldir }}/asynchronous_connection_failover.sh" }
+
+- name: Auto config my.cnf
+  shell: "sudo sh -x {{ etcdir }}/my.cnf_auto.sh"
+
+- name: Remove my.cnf_auto.sh
+  file:
+    path: "{{ etcdir }}/my.cnf_auto.sh"
+    state: absent
+    remote_src: yes
+
+# - name: Obtain user_whitelist
+#   shell: "sudo cat /tmp/user_whitelist.txt"
+#   register: user_whitelist
+
+- name: Initial mysql server
+  shell: "sudo {{ item }}"
+  with_items:
+    - "/usr/sbin/mysqld --defaults-file={{ etcdir }}/my_{{ mysql_port }}.cnf --user=mysql --lower-case-table-names=1 \
+    --initialize-insecure --basedir=/usr/ --datadir={{ datadir }}"
+    - "/usr/bin/mysql_ssl_rsa_setup --datadir={{ datadir }}"
+
+- name: Clean system's buffer and cache
+  sysctl:
+    name: vm.drop_caches
+    value: '1'
+    state: present
+
+- name: Force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+
+- name: Start mysql server
+  systemd:
+    name: mysqld_{{ mysql_port }}
+    state: started
+
+- name: Enable mysql server
+  systemd:
+    name: mysqld_{{ mysql_port }}
+    enabled: yes
+
+- name: Wait for MySql is running
+  pause: seconds=7
+
+- name: Create a symbolic link for "/tmp/mysql.sock"
+  file:
+    src: "{{ datadir }}/mysql.sock"
+    dest: /var/lib/mysql/mysql.sock
+    state: link
+
+- name: Install the mysql-python
+  yum:
+    name: [perl-DBD-mysql, MySQL-python]
+    state: latest
+  register: result
+  retries: 7
+  until: result is succeeded
+
+- name: Modify root password
+  mysql_user:
+    login_user: root
+    login_password:
+    login_host: localhost
+    name: root
+    password: "{{ root_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    priv: '*.*:ALL,GRANT'
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add root@127.0.0.1 user 
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: root
+    password: "{{ root_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "127.0.0.1"
+    priv: '*.*:ALL,GRANT'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add remote root user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: root
+    password: "{{ root_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
+    priv: '*.*:ALL,GRANT'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add repl user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: repl
+    password: "{{ mysql_monitor_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "%"
+    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add pmm user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: pmm
+    password: "{{ pmm_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: 127.0.0.1
+    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add audit user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: audit
+    password: "{{ mysql_monitor_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
+    priv: '*.*:REPLICATION SLAVE,SUPER,REPLICATION CLIENT'
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add business user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: "{{ business_user }}"
+    password: "{{ business_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
+    priv: "{{ business_user }}.*:SELECT,UPDATE,DELETE,INSERT"
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Add global read only user
+  mysql_user:
+    login_user: root
+    login_password: "{{ root_password }}"
+    name: global
+    password: "{{ read_only_password }}"
+    update_password: always
+    login_port: "{{ mysql_port }}"
+    host: "{{ ansible_default_ipv4.network }}/24"
+    priv: "*.*:SELECT"
+    sql_log_bin: no
+    login_unix_socket: "{{ socket }}"
+    state: present
+
+- name: Case sensitive password string match for logining mysql
+  expect:
+    command: "/usr/bin/mysql_config_editor set --login-path=mysql_{{ mysql_port }} --host=127.0.0.1 -P {{ mysql_port }} --user=root --password"
+    responses:
+      (?i)password: "{{ root_password }}"
+      (?i)Continue: y
+    echo: yes
+  # no_log: True
+
+- name: Copy the mgr_monitor.sql
+  copy: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}/"
+  with_items:
+    - { src: 'mgr_monitor_official.sql', dest: "{{ shelldir }}/" }
+
+- name: Rendering the check.sql
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: 'check.sql.j2', dest: "{{ shelldir }}/check.sql" }
+
+- name: Execute mgr_monitor.sql
+  shell: "sudo /usr/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/mgr_monitor_official.sql"
+
+- name: Rendering logrotate for mysql error log
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0640
+  with_items:
+    - { src: 'mysql.j2', dest: '/etc/logrotate.d/mysql_{{ mysql_port }}'}
+
+- name: Add the job of logrotate for msyql error log
+  cron:
+    name: "mysql_{{ mysql_port }} logrotate"
+    weekday: "6"
+    minute: "55"
+    hour: "23"
+    job: "/usr/sbin/logrotate -vf -s /var/lib/logrotate/logrotate.status /etc/logrotate.d/mysql_{{ mysql_port }} > /dev/null 2>&1 &"
+
+# - name: Set some parameters
+#   mysql_variables:
+#     login_user: root
+#     login_password: "{{ root_password }}"
+#     login_port: "{{ mysql_port }}"
+#     login_unix_socket: "{{ socket }}"
+#     variable: "{{ item.original }}"
+#     value: "{{ item.change }}"
+#   with_items:
+#     #- { original: 'rpl_semi_sync_slave_enabled', change: '1' }
+#     #- { original: 'rpl_semi_sync_master_enabled', change: '1' }
+#     #- { original: 'rpl_semi_sync_master_timeout', change: '500' } #兼容8.0.25
+#     - { original: 'clone_enable_compression', change: '1' }
+#     #- { original: 'group_replication_start_on_boot', change: '1' }
+#     #目前组复制节点被操作系统KILL后再自动启动加入组复制会导致整个组复制无PRIMARY或者其他问题，需要人工介入修复，故不建议随mysql启动
+#   when: not mysql57
+
+# - name: Modify semisync parameter and clone parameter in my.cnf
+#   replace:
+#     path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
+#     regexp: "{{ item.original }}"
+#     replace: "{{ item.change }}"
+#   with_items:
+#     #- { original: '#rpl_semi_sync_slave_enabled = 1', change: 'rpl_semi_sync_slave_enabled = 1' }
+#     #- { original: '#rpl_semi_sync_master_enabled = 1', change: 'rpl_semi_sync_master_enabled = 1' }
+#     #- { original: '#rpl_semi_sync_master_timeout = 500', change: 'rpl_semi_sync_master_timeout = 500' }#兼容8.0.25
+#     - { original: '#clone_enable_compression = 1', change: 'clone_enable_compression = 1' }
+#     #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
+#   when: not mysql57
+
+- name: Start proxysql_binlog_reader
+  shell: "proxysql_binlog_reader -h 127.0.0.1 -u repl -p\'{{ mysql_monitor_password }}\' -P {{ mysql_port }} \
+  -l {{ proxysql_binlog_reader_port }} -L {{ logdir }}/binlog_reader_m{{ mysql_port }}_r{{ proxysql_binlog_reader_port }}.log"

@@ -6,7 +6,6 @@
     is_standalone: True # Whether to install stand-alone version
     slave_monitor_replication: true # Whether to enable asynchronous replication instances for MGR
     asynchronous_connection_failover: false # Whether to enable asynchronous connection failover
-    mysql57: False # Whether to install mysql5.7
     whether_uninstall: true # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

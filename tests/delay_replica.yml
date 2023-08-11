@@ -5,7 +5,6 @@
   vars:
     is_standalone: True # Whether to install stand-alone version
     delay_replication: True # Whether explicitly specified parameters for innodb_log_files_in_group
-    mysql57: False # Whether to install mysql5.7
     whether_uninstall: false # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

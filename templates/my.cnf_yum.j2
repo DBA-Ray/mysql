@@ -37,12 +37,17 @@
   binlog_stmt_cache_size = 32k #用于在非事务期间保存对二进制日志的更改的内存缓冲区的大小
 
 # basic
-  basedir = {{ basedir }}
+  basedir = /usr/
   datadir = {{ datadir }}
   tmpdir = {{ datadir }}
   socket = {{ datadir }}/mysql.sock
   mysqlx_socket = {{ datadir }}/mysqlx.sock
   log-error = {{ logdir }}/mysqld_{{ mysql_port }}.log
+{% if mysql81 == True %}  
+  lc_messages_dir = /usr/share/mysql-8.1/
+{% elif mysql80 == True %}
+  lc_messages_dir = /usr/share/mysql-8.0/
+{% endif %}
   loose_log_syslog = OFF
   pid-file = {{ datadir }}/mysqld.pid
   authentication_policy = mysql_native_password

@@ -7,6 +7,5 @@
     is_standalone: True # Whether to install stand-alone version
     innodb_cluster: false # Whether to config innodb cluster
     whether_uninstall: false # Whether to uninstall the original service and then install it
-    mysql57: False # Whether to install mysql5.7
   roles:
     - dba_ray.mysql

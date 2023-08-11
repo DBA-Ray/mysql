@@ -2,7 +2,8 @@
 Description=MySQL Server
 Documentation=man:mysqld(8)
 Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
-After=network.target
+After=network-online.target
+Wants=network-online.target
 After=syslog.target
 
 [Install]
@@ -12,19 +13,25 @@ WantedBy=multi-user.target
 User=mysql
 Group=mysql
 
-Type=simple
+Type=notify
 
 # Disable service start and stop timeout logic of systemd for mysqld service.
 TimeoutSec=0
 
+# Execute pre and post scripts as root
+PermissionsStartOnly=true
+
+# Needed to create system tables
+ExecStartPre=/usr/bin/mysqld_pre_systemd
+
 # Start main service
-ExecStart=/usr/bin/numactl --interleave=all {{ basedir }}/bin/mysqld --defaults-file={{ etcdir }}/my_{{ mysql_port }}.cnf $MYSQLD_OPTS 
+ExecStart=/usr/bin/numactl --interleave=all /usr/sbin/mysqld --defaults-file={{ etcdir }}/my_{{ mysql_port }}.cnf $MYSQLD_OPTS 
 
 # Use this to switch malloc implementation
 EnvironmentFile=-/etc/sysconfig/mysql
 
 # Sets open_files_limit
-LimitNOFILE = 42010
+LimitNOFILE = 70010
 
 Restart=on-failure
 
@@ -34,4 +41,3 @@ RestartPreventExitStatus=1
 Environment=MYSQLD_PARENT_PID=1
 
 PrivateTmp=false
-

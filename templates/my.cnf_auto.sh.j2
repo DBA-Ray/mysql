@@ -109,3 +109,27 @@ fi
 #group_replication_member_weight=`expr ${incre_offset} \* $b`
 
 #sed -i 's|loose-group_replication_member_weight = 1|loose-group_replication_member_weight = '"${group_replication_member_weight}"'|g' {{ etcdir }}/my_{{ mysql_port }}.cnf
+
+#####关闭proxysql_binlog_reader#####
+
+pbr_amount=`ps -C proxysql_binlog_reader --no-header|wc -l`
+
+if [ ${pbr_amount} >0 ]
+
+then
+
+for ((i=1;i<=${pbr_amount};i++))
+
+do 
+
+pid=`ps -C proxysql_binlog_reader --no-header|awk "NR==${i}"|awk '{printf $1}'`
+
+kill -9 ${pid}
+
+done
+
+else
+
+exit 1
+
+fi

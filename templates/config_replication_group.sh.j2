@@ -16,14 +16,14 @@ if [ "{{ ansible_hostname }}" == "{{ primary_hostname }}" ]
 
 then
 
-{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;\
+mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;\
 CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';\
 SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION;\
 SET GLOBAL group_replication_bootstrap_group=OFF;"
 
 sleep 5
 
-{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "REVOKE SELECT ON mysql.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
+mysql -uroot -p${1} -S {{ socket }} -e "REVOKE SELECT ON mysql.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
 REVOKE SELECT ON mysql_innodb_cluster_metadata.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
 REVOKE SELECT ON performance_schema.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
 REVOKE SELECT ON sys.* FROM 'global'@'{{ ansible_default_ipv4.network }}/24';\
@@ -33,9 +33,9 @@ else
 
 sleep 20
 
-{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl',\
+mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL super_read_only=0;STOP GROUP_REPLICATION;RESET SLAVE ALL;CHANGE MASTER TO MASTER_USER='repl',\
 MASTER_PASSWORD='${2}' FOR CHANNEL 'group_replication_recovery';RESET MASTER;START GROUP_REPLICATION;"
 
-MEMBER_STATE=`{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;"`
+MEMBER_STATE=`mysql -uroot -p${1} -S {{ socket }} -e "SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid\G;"`
 
 fi

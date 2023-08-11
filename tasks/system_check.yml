@@ -1,10 +1,20 @@
 
-- name: Copy the mysql-community.repo
-  copy: src=mysql-community.repo dest=/etc/yum.repos.d/mysql-community.repo
+- name: Enable mysql8.1 repo
+  copy: src=mysql-community.repo8.1 dest=/etc/yum.repos.d/mysql-community.repo
+  when: mysql81 | default(False)
+
+- name: Enable mysql8.0 repo
+  copy: src=mysql-community.repo8.0 dest=/etc/yum.repos.d/mysql-community.repo
+  when: mysql80 | default(False)
 
 - name: Enable mysql5.7 repo
-  copy: src=mysql-community.repo57 dest=/etc/yum.repos.d/mysql-community.repo
+  copy: src=mysql-community.repo5.7 dest=/etc/yum.repos.d/mysql-community.repo
   when: mysql57 | default(False)
+
+- name: Uninstall Percona dependency
+  yum:
+    name: [Percona-Server*, percona-release*]
+    state: absent
 
 - name: Install base packages
   yum:
@@ -16,7 +26,7 @@
     name: pexpect
     state: latest
 
-#- name: Install the mysql repo
+# - name: Install the mysql repo
 #  yum:
 #    name: "{{ remote_repo }}"
 #    state: present
@@ -43,6 +53,11 @@
     - "{{ shelldir }}"
   when: whether_uninstall | default(False)
 
+- name: Uninstall mysql server
+  yum:
+    name: [mysql-community*, mysql-shell*]
+    state: absent
+  when: whether_uninstall | default(False)
 #- name: upgrade all packages
 #  yum:
 #    name: '*'

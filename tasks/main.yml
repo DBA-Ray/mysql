@@ -10,7 +10,10 @@
   when: is_standalone | default(False)
 
 - include: initial_start.yml
-  when: is_standalone | default(False)
+  when: ( is_standalone | default(False) ) and ( not enable_yum | default(False) )
+
+- include: initial_start_yum.yml
+  when: ( is_standalone | default(False) ) and ( enable_yum | default(False) )
 
 - include: initial_group_replication.yml
   when: mysql_group_replication | default(False)

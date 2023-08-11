@@ -12,7 +12,7 @@ packages:
   - perl-DBD-mysql
   - expect
   - MySQL-python
-  - mysql-shell
+  # - mysql-shell
   - zstd
   - python2-dnf
   - epel-release

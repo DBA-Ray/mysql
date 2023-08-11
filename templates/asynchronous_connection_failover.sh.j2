@@ -17,7 +17,7 @@ b=10 #weight constant
 # mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL clone_valid_donor_list = '{{ primary_hostname }}:{{ mysql_port }}';\
 # CLONE INSTANCE FROM repl@'{{ primary_hostname }}':{{ mysql_port }} IDENTIFIED BY '${2}';"
 
-{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "change replication source to source_user='repl',source_password='${2}',\
+mysql -uroot -p${1} -S {{ socket }} -e "change replication source to source_user='repl',source_password='${2}',\
 source_host='{{ primary_hostname }}',source_auto_position=1,source_connection_auto_failover=1,\
 source_port={{ mysql_port }},source_retry_count=5,source_connect_retry=6 for channel '{{ primary_hostname }}_single';"
 
@@ -33,5 +33,5 @@ source_port={{ mysql_port }},source_retry_count=5,source_connect_retry=6 for cha
 
 #done
 
-{{ basedir }}/bin/mysql -uroot -p${1} -S {{ socket }} -e "SELECT asynchronous_connection_failover_add_managed('{{ primary_hostname }}_single', 'GroupReplication',\
+mysql -uroot -p${1} -S {{ socket }} -e "SELECT asynchronous_connection_failover_add_managed('{{ primary_hostname }}_single', 'GroupReplication',\
  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{{ primary_hostname }}', {{ mysql_port }}, '', 80, 60);"
