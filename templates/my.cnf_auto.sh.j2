@@ -122,9 +122,21 @@ for ((i=1;i<=${pbr_amount};i++))
 
 do 
 
-pid=`ps -C proxysql_binlog_reader --no-header|awk "NR==${i}"|awk '{printf $1}'`
+pid=`ps -C proxysql_binlog_reader --no-header|awk "NR==1"|awk '{printf $1}'`
+
+if [ ${pid} ]
+
+then
 
 kill -9 ${pid}
+
+else
+
+echo "The pid of proxysql_binlog_reader does not exist!"
+
+continue
+
+fi
 
 done
 
