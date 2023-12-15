@@ -51,6 +51,7 @@
     - "{{ logdir }}/mysqld_{{ mysql_port }}.log"
     - "{{ logdir }}/slow_{{ mysql_port }}.log"
     - "{{ shelldir }}"
+    - "{{ routerdir}}"
   when: whether_uninstall | default(False)
 
 - name: Uninstall mysql server

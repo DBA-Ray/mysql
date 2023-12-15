@@ -24,17 +24,27 @@
 
 - name: Case sensitive password string match for bootstrap mysqlrouter
   expect:
-    command: "mysqlrouter --user=mysqlrouter --bootstrap repl@{{ primary_hostname }}:{{ mysql_port }} --directory {{ routerdir}}/{{ env }} --conf-use-sockets --conf-base-port {{ mysql_port }} --account repl --account-host {{ ansible_default_ipv4.network }}/24"
+    command: "mysqlrouter --user=mysqlrouter --bootstrap root@127.0.0.1:{{ mysql_port }} --directory {{ routerdir}}/{{ env }} --conf-use-sockets \
+    --account repl --account-host {{ ansible_default_ipv4.network }}/24 \
+    --conf-set-option=logger.level=warning \
+    --conf-set-option=default.max_total_connections={{ max_connections }} \
+    --conf-set-option=default.max_connections={{ max_connections }} \
+    --conf-set-option=connection_pool.max_idle_server_connections={{ (max_connections) // 10 }} \
+    --conf-set-option=connection_pool.idle_timeout={{ timeout }} \
+    --conf-set-option=routing:bootstrap_rw_split.connection_sharing=1 \
+    --conf-set-option=routing:bootstrap_rw_split.connection_sharing_delay=100 \ 
+    --conf-set-option=routing:bootstrap_rw_split.max_connect_errors={{ (max_connections) * 10 }} \
+    --force"
     responses:
-      (?i)repl: "{{ mysql_monitor_password }}"
+      (?i)root: "{{ root_password }}"
       (?i)repl: "{{ mysql_monitor_password }}"
     echo: yes
-  no_log: True
+  #no_log: True
 
 - name: Start mysqlrouter
   systemd:
     name: mysqlrouter_{{ mysql_port }}
-    state: started
+    state: restarted
 
 - name: Enable mysqlrouter
   systemd:

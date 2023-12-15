@@ -1,11 +1,12 @@
 ---
-- hosts: mgr2_pro1:mgr3_pro1
-# - hosts: "{{ deploy_hosts }}"
+#- hosts: mgr2_pro1:mgr3_pro1
+- hosts: "{{ deploy_hosts }}"
   gather_facts: True
   remote_user: root
   vars:
-    is_standalone: True # Whether to install stand-alone version
-    innodb_cluster: false # Whether to config innodb cluster
-    whether_uninstall: false # Whether to uninstall the original service and then install it
+    is_standalone: true # Whether to install stand-alone version
+    innodb_cluster: true # Whether to config innodb cluster
+    mysql_router: True # Whether to config mysql router
+    whether_uninstall: true # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

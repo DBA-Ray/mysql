@@ -15,7 +15,7 @@
   pause: seconds=5
 
 - name: Obtain the member status
-  shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
+  shell: "sudo mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
   register: MEMBER_STATE
 
 - name: Show the MEMBER_STATE

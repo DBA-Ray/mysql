@@ -27,14 +27,14 @@ performance_or_safety: performance
 business_user: actest
 #Version
 mysql57: False
-mysql80: true
-mysql_upgrade_version: mysql-8.0.33-el7-x86_64
+mysql80: False
+mysql_upgrade_version: mysql-8.2.0-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.0.33-el7-x86_64
+mysql_version: mysql-8.2.0-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-mysql81: False
+mysql81: True
 enable_yum: True
-mysql_community_server: mysql-community-server-8.0.34-1.el7.x86_64
+mysql_community_server: mysql-community-server-8.2.0-1.el7.x86_64
 proxysql_binlog_reader_package: proxysql-mysqlbinlog-2.1-5-g7f50bd0-centos7.x86_64.rpm
 proxysql_binlog_reader_port: 3307
 # Directory path
