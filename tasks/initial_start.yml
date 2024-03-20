@@ -201,7 +201,7 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: "%"
-    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT'
+    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT/MYSQL_INNODB_CLUSTER_METADATA.*:SELECT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
