@@ -17,7 +17,7 @@
   binlog_checksum = CRC32
   binlog_transaction_compression = 0
   binlog_transaction_compression_level_zstd = 7 #（1-22）
-  transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。
+ #transaction_write_set_extraction = XXHASH64 #以便在server收集写集合的同时将其记录到二进制日志。写集合基于每行的主键，并且是行更改后的唯一标识此标识将用于检测冲突。8.3.0不适用
 {% if performance_or_safety == 'performance' %}
   sync_binlog = 1000 #每写入1000次系统缓存就执行一次写入磁盘并刷新的操作，会有数据丢失的风险。
   innodb_flush_log_at_trx_commit = 2 #事务提交时，把事务日志从缓存区写到日志文件中，日志文件会每秒写入到磁盘，如果写入前系统崩溃，就会导致最后1秒的日志丢失。
@@ -67,8 +67,8 @@
 
 # repilication_settings
   gtid_mode = on
-  enforce_gtid_consistency = true
-  master_info_repository = TABLE
+  #master_info_repository = TABLE  #8.3.0不适用
+  #relay_log_info_repository = TABLE  #8.3.0不适用
   relay_log_info_repository = TABLE
 {% if delay_replication == True or slave_monitor_replication == True %}
   read_only = 1
