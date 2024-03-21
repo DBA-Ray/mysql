@@ -17,10 +17,12 @@
 - name: Obtain the member status
   shell: "sudo mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
   register: MEMBER_STATE
+  when: ansible_hostname != "{{ primary_hostname }}"
 
 - name: Show the MEMBER_STATE
   debug:
     msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+  when: ansible_hostname != "{{ primary_hostname }}"
 
 - name: Check the member status
   pause: seconds=10
