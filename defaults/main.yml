@@ -32,7 +32,8 @@ mysql_upgrade_version: mysql-8.2.0-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
 mysql_version: mysql-8.2.0-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-#Install MySQL using yum 
+#Install MySQL using yum
+#Modifying the source version of yum must be consistent with the specific version below
 mysql57: False
 mysql80: true
 mysql81: False
