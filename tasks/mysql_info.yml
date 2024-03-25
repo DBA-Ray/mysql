@@ -1,6 +1,6 @@
 # Gather information about MySQL servers
 - name: Get MySQL version with credentials
-  mysql_info:
+  community.mysql.mysql_info:
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"
@@ -13,7 +13,7 @@
     msg: "The MySQL version of {{ ansible_hostname }} is: {{ mysql_version | json_query(\"version.*\") | join ('-') }}"
 
 - name: Get the size of MySQL database  with credentials
-  mysql_info:
+  community.mysql.mysql_info:
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"

@@ -14,15 +14,50 @@
 - name: Wait the member status
   pause: seconds=5
 
-- name: Obtain the member status
-  shell: "sudo mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
-  register: MEMBER_STATE
-  when: ansible_hostname != "{{ primary_hostname }}"
-
 - name: Show the MEMBER_STATE
-  debug:
-    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
-  when: ansible_hostname != "{{ primary_hostname }}"
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid
 
 - name: Check the member status
+  pause: seconds=10
+  
+- name: Set auto_increment_offset=1 for secondry
+  community.mysql.mysql_variables:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    variable: "{{ item.original }}"
+    value: "{{ item.change }}"
+    mode: persist
+  with_items:
+    - { original: 'super_read_only', change: '0' }
+    - { original: 'auto_increment_offset', change: '1' }
+    - { original: 'super_read_only', change: '1' }
+  when: ansible_hostname != "{{ primary_hostname }}"
+    
+- name: Set auto_increment_offset=1 for primary
+  community.mysql.mysql_variables:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    variable: auto_increment_offset
+    value: 1
+    mode: persist
+  when: ansible_hostname == "{{ primary_hostname }}"
+  
+- name: Check for auto_increment_offset setting
+  community.mysql.mysql_variables:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    variable: auto_increment_offset
+
+- name: Check the auto_increment_offset setting
   pause: seconds=10

@@ -1,7 +1,7 @@
 # Manage mysql my.cnf
 
 - name: Check for global variables
-  mysql_variables:
+  community.mysql.mysql_variables:
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"
@@ -18,7 +18,7 @@
   tags: present,show_variables
 
 - name: Set global variables value
-  mysql_variables:
+  community.mysql.mysql_variables:
     login_user: root
     login_password: "{{ root_password }}"
     login_port: "{{ mysql_port }}"

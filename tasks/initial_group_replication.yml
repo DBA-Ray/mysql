@@ -12,13 +12,13 @@
 - name: Wait the member status
   pause: seconds=5
 
-- name: Obtain the member status
-  shell: "mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/check.sql|grep MEMBER_STATE|awk '{print $2}'"
-  register: MEMBER_STATE
-
 - name: Show the MEMBER_STATE
-  debug:
-    msg: "The member status of mysql on {{ ansible_hostname }} is {{ MEMBER_STATE.stdout }}"
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: SELECT MEMBER_STATE FROM performance_schema.replication_group_members where MEMBER_ID=@@server_uuid
 
 - name: Check the member status
   pause: seconds=10

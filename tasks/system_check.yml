@@ -38,7 +38,7 @@
   systemd:
     name: "mysqld_{{ mysql_port }}"
     state: stopped
-  when: whether_uninstall | default(False)
+  when: whether_uninstall | default(False) 
 
 - name: Remove existing mysql data directory and file
   file:
@@ -56,7 +56,7 @@
 
 - name: Uninstall mysql server
   yum:
-    name: [mysql-community*, mysql-shell*]
+    name: [mysql-community*, mysql-shell* ,mysql-router*]
     state: absent
   when: whether_uninstall | default(False)
 #- name: upgrade all packages

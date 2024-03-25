@@ -12,12 +12,13 @@ then
 
 fi
 
-b=10 #weight constant
+#b=10 #weight constant
 
-# mysql -uroot -p${1} -S {{ socket }} -e "SET GLOBAL clone_valid_donor_list = '{{ primary_hostname }}:{{ mysql_port }}';\
-# CLONE INSTANCE FROM repl@'{{ primary_hostname }}':{{ mysql_port }} IDENTIFIED BY '${2}';"
+mysql -uroot -p${1} -S {{ socket }} -e "CLONE INSTANCE FROM root@'{{ primary_hostname }}':{{ mysql_port }} IDENTIFIED BY '${1}';"
 
-mysql -uroot -p${1} -S {{ socket }} -e "change replication source to source_user='repl',source_password='${2}',\
+sleep 11
+
+mysql -uroot -p${1} -S {{ socket }} -e "change replication source to source_user='root',source_password='${1}',\
 source_host='{{ primary_hostname }}',source_auto_position=1,source_connection_auto_failover=1,\
 source_port={{ mysql_port }},source_retry_count=5,source_connect_retry=6 for channel '{{ primary_hostname }}_single';"
 

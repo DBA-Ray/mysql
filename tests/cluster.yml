@@ -6,7 +6,7 @@
   vars:
     is_standalone: true # Whether to install stand-alone version
     innodb_cluster: true # Whether to config innodb cluster
-    mysql_router: True # Whether to config mysql router
+    mysql_router: true # Whether to config mysql router
     whether_uninstall: true # Whether to uninstall the original service and then install it
   roles:
     - dba_ray.mysql

@@ -152,7 +152,7 @@
     state: link
 
 - name: Modify root password
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password:
     login_host: localhost
@@ -160,12 +160,12 @@
     password: "{{ root_password }}"
     update_password: always
     login_port: "{{ mysql_port }}"
-    priv: '*.*:ALL,GRANT'
+    priv: '*.*:ALL,GRANT,CLONE_ADMIN,BACKUP_ADMIN'
     login_unix_socket: "{{ socket }}"
     state: present
 
 - name: Add root@127.0.0.1 user 
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: root
@@ -179,7 +179,7 @@
     state: present
 
 - name: Add remote root user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: root
@@ -193,7 +193,7 @@
     state: present
 
 - name: Add repl user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: repl
@@ -201,13 +201,13 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: "%"
-    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT/MYSQL_INNODB_CLUSTER_METADATA.*:SELECT'
+    priv: '*.*:REPLICATION SLAVE,REPLICATION CLIENT,Execute,Process,CLONE_ADMIN,BACKUP_ADMIN/PERFORMANCE_SCHEMA.*:SELECT/SYS.*:SELECT/MYSQL_INNODB_CLUSTER_METADATA.*:SELECT'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
 
 - name: Add pmm user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: pmm
@@ -215,13 +215,13 @@
     update_password: always
     login_port: "{{ mysql_port }}"
     host: 127.0.0.1
-    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
+    priv: '*.*:SELECT,RELOAD,PROCESS,SUPER,REPLICATION CLIENT,CLONE_ADMIN,BACKUP_ADMIN/PERFORMANCE_SCHEMA.*:SELECT,UPDATE,DELETE,DROP'
     sql_log_bin: no
     login_unix_socket: "{{ socket }}"
     state: present
 
 - name: Add audit user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: audit
@@ -235,7 +235,7 @@
     state: present
 
 - name: Add business user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: "{{ business_user }}"
@@ -249,7 +249,7 @@
     state: present
 
 - name: Add global read only user
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ root_password }}"
     name: global
@@ -277,16 +277,6 @@
     dest: "{{ item.dest }}/"
   with_items:
     - { src: 'mgr_monitor_official.sql', dest: "{{ shelldir }}/" }
-
-- name: Rendering the check.sql
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - { src: 'check.sql.j2', dest: "{{ shelldir }}/check.sql" }
 
 - name: Execute mgr_monitor.sql
   shell: "sudo {{ basedir }}/bin/mysql --login-path=mysql_{{ mysql_port }} < {{ shelldir }}/mgr_monitor_official.sql"
@@ -339,6 +329,6 @@
 #     #- { original: 'loose-group_replication_start_on_boot = off', change: 'loose-group_replication_start_on_boot = on' }
 #   when: not mysql57
 
-- name: Start proxysql_binlog_reader
-  shell: "proxysql_binlog_reader -h 127.0.0.1 -u repl -p\'{{ mysql_monitor_password }}\' -P {{ mysql_port }} \
-  -l {{ proxysql_binlog_reader_port }} -L {{ logdir }}/binlog_reader_m{{ mysql_port }}_r{{ proxysql_binlog_reader_port }}.log"
+# - name: Start proxysql_binlog_reader
+  # shell: "proxysql_binlog_reader -h 127.0.0.1 -u repl -p\'{{ mysql_monitor_password }}\' -P {{ mysql_port }} \
+  # -l {{ proxysql_binlog_reader_port }} -L {{ logdir }}/binlog_reader_m{{ mysql_port }}_r{{ proxysql_binlog_reader_port }}.log"

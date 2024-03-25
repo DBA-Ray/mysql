@@ -26,19 +26,17 @@ performance_or_safety: performance
 # business info
 business_user: actest
 #Version
-mysql57: False
-mysql80: False
-mysql_upgrade_version: mysql-8.2.0-el7-x86_64
+mysql_upgrade_version: mysql-8.0.36-el7-x86_64
 mysql_upgrade_package: "{{ mysql_upgrade_version }}.tar.gz"
-mysql_version: mysql-8.2.0-el7-x86_64
+mysql_version: mysql-8.0.36-el7-x86_64
 package_name: "{{ mysql_version }}.tar.gz"
-#Install MySQL using yum
+#Install MySQL using yum 
 #Modifying the source version of yum must be consistent with the specific version below
 mysql57: False
-mysql80: true
-mysql81: False
+mysql80: false
+mysql81: true
 enable_yum: True
-mysql_community_server: mysql-community-server-8.0.36-1.el7.x86_64
+mysql_community_server: mysql-community-server-8.3.0-1.el7.x86_64
 proxysql_binlog_reader_package: proxysql-mysqlbinlog-2.1-5-g7f50bd0-centos7.x86_64.rpm
 proxysql_binlog_reader_port: 3307
 # Directory path
@@ -80,6 +78,6 @@ option_value:
   # - { option: 'replica_preserve_commit_order', value: '1' }
   #  - { option: 'replica_parallel_workers', value: '128' }
 # manage_replication.yml
-master_host: master
-master_port: 3377
-master_user: repl
+source_host: master
+source_port: 3377
+source_user: repl

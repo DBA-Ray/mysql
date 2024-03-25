@@ -1,23 +1,30 @@
-# - name: Modify read_only parameter in my.cnf
-#   replace:
-#     path: "{{ etcdir }}/my_{{ mysql_port }}.cnf"
-#     regexp: "{{ item.original }}"
-#     replace: "{{ item.change }}"
-#   with_items:
-#     - { original: '#read_only = 1', change: 'read_only = 1' }
-#     - { original: 'replica_preserve_commit_order = on', change: 'replica_preserve_commit_order = off' }
+- name: Clone instance from primary
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: CLONE INSTANCE FROM root@%s:%s IDENTIFIED BY %s;
+    positional_args:
+    - "{{ primary_hostname }}"
+    - "{{ mysql_port }}"
+    - "{{ root_password }}"
 
-# - name: Set slave exclusive parameter
-#   mysql_variables:
-#     login_user: root
-#     login_password: "{{ root_password }}"
-#     login_port: "{{ mysql_port }}"
-#     login_unix_socket: "{{ socket }}"
-#     variable: "{{ item.original }}"
-#     value: "{{ item.change }}"
-#   with_items:
-#     - { original: 'read_only', change: '1' }
-#     - { original: 'replica_preserve_commit_order', change: '0' }
+- name: Wait for MySql is running
+  pause: seconds=30
+
+- name: Config replication for primary with connection failover
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: change replication source to source_user='root',source_password=%s,source_host=%s,source_auto_position=1,source_connection_auto_failover=1,source_port=%s,source_retry_count=5,source_connect_retry=6 for channel %s
+    positional_args:
+    - "{{ root_password }}"
+    - "{{ primary_hostname }}"
+    - "{{ mysql_port }}"
+    - "{{ primary_hostname }}"
 
 - name: Config replication for mgr1 without connection failover
   mysql_replication:
@@ -33,31 +40,70 @@
     master_auto_position: yes
   when: not asynchronous_connection_failover | default (True)
 
-- name: Config asynchronous_connection_failover
-  shell: "sudo sh -x {{ shelldir }}/asynchronous_connection_failover.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"
+#- name: Config asynchronous_connection_failover
+#  shell: "sudo sh -x {{ shelldir }}/asynchronous_connection_failover.sh '{{ root_password }}' '{{ mysql_monitor_password }}'"
 
-- name: Start slave status for slaves
-  mysql_replication:
+- name: Start replica
+  community.mysql.mysql_replication:
     login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
-    mode: startslave
+    mode: startreplica
 
-- name: Get slave status from slaves
-  mysql_replication:
+- name: Wait for replica is running
+  pause: seconds=5
+
+- name: Get replica status from replicas
+  community.mysql.mysql_replication:
     login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
-    mode: getslave
+    mode: getreplica
   register: status
 
 - name: Show the status of replicas
   debug:
     msg:
-      - "Slave_SQL_Running is:{{ status | json_query(\"Slave_SQL_Running\") }}"
-      - "Slave_IO_Running is: {{ status | json_query(\"Slave_IO_Running\") }}"
-      - "Seconds_Behind_Master is: {{ status | json_query(\"Seconds_Behind_Master\") }}"
+      - "Replica_SQL_Running is:{{ status | json_query(\"Replica_SQL_Running\") }}"
+      - "Replica_IO_Running is: {{ status | json_query(\"Replica_IO_Running\") }}"
+      - "Seconds_Behind_Source is: {{ status | json_query(\"Seconds_Behind_Source\") }}"
       - "Last_Error is: {{ status | json_query(\"Last_Error\") }}"
-      - "Master_Host is: {{ status | json_query(\"Master_Host\") }}"
+      - "Source_Host is: {{ status | json_query(\"Source_Host\") }}"
+
+- name: Check the replica status
+  pause: seconds=10
+
+- name: Get group_replication_group_name from primary
+  community.mysql.mysql_variables:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_host: "{{ primary_hostname }}"
+    variable: group_replication_group_name
+  register: group_name
+      
+- name: Config asynchronous_connection_failover_add_managed
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: SELECT asynchronous_connection_failover_add_managed(%s, 'GroupReplication', %s, %s, %s, '', 80, 60)
+    positional_args:
+    - "{{ primary_hostname }}"
+    - "{{ group_name.msg }}"
+    - "{{ primary_hostname }}"
+    - "{{ mysql_port }}"
+
+- name: Check for asynchronous_connection_failover_add_managed
+  community.mysql.mysql_query:
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ root_password }}"
+    login_unix_socket: "{{ socket }}"
+    query: select * from performance_schema.replication_asynchronous_connection_failover_managed
+
+- name: Check the replication_asynchronous_connection_failover_managed
+  pause: seconds=10
