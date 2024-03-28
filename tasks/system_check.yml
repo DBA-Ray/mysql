@@ -40,6 +40,12 @@
     state: stopped
   when: whether_uninstall | default(False) 
 
+- name: Stop mysqlrouter server
+  systemd:
+    name: "mysqlrouter_{{ mysql_port }}.service"
+    state: stopped
+  when: whether_uninstall | default(False) 
+
 - name: Remove existing mysql data directory and file
   file:
     path: "{{ item }}"

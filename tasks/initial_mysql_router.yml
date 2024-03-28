@@ -25,7 +25,7 @@
 - name: Case sensitive password string match for bootstrap mysqlrouter
   expect:
     command: "mysqlrouter --user=mysqlrouter --bootstrap root@127.0.0.1:{{ mysql_port }} --directory {{ routerdir}}/{{ env }} --conf-use-sockets \
-    --account repl --account-host {{ ansible_default_ipv4.network }}/24 \
+    --account router_bootstrap --account-host {{ ansible_default_ipv4.network }}/24 \
     --conf-set-option=logger.level=warning \
     --conf-set-option=default.max_total_connections={{ max_connections }} \
     --conf-set-option=default.max_connections={{ max_connections }} \
@@ -37,7 +37,7 @@
     --force"
     responses:
       (?i)root: "{{ root_password }}"
-      (?i)repl: "{{ mysql_monitor_password }}"
+      (?i)router_bootstrap: "{{ mysql_monitor_password }}"
     echo: yes
   #no_log: True
 

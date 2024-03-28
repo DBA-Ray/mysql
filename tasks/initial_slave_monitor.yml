@@ -19,9 +19,9 @@
     login_user: root
     login_password: "{{ root_password }}"
     login_unix_socket: "{{ socket }}"
-    query: change replication source to source_user='root',source_password=%s,source_host=%s,source_auto_position=1,source_connection_auto_failover=1,source_port=%s,source_retry_count=5,source_connect_retry=6 for channel %s
+    query: change replication source to source_user='repl',source_password=%s,source_host=%s,source_auto_position=1,source_connection_auto_failover=1,source_port=%s,source_retry_count=5,source_connect_retry=6 for channel %s
     positional_args:
-    - "{{ root_password }}"
+    - "{{ mysql_monitor_password }}"
     - "{{ primary_hostname }}"
     - "{{ mysql_port }}"
     - "{{ primary_hostname }}"
