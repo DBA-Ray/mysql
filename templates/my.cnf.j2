@@ -164,7 +164,7 @@
   innodb_buffer_pool_instances = 8
   innodb_log_buffer_size = 1073741824 #写入磁盘上日志文件的缓冲区的大小
   #innodb_log_file_size = 1G #by innodb_dedicated_server
-  #innodb_flush_method = O_DIRECT_NO_FSYNC #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选 by innodb_dedicated_server
+  innodb_flush_method = O_DIRECT #避免双重缓冲，让数据库跳过文件系统缓冲直接和设备进行交互，SSD必选
   innodb_open_files = {{ max_connections * 3 }} #保持打开ibd文件最大值，随table_open_cache变化
   innodb_io_capacity = {{ innodb_io_capacity }}  #InnoDB后台任务IOPS
   innodb_io_capacity_max = {{ innodb_io_capacity * 10 }} #InnoDB后台任务IOPS最大值
@@ -188,10 +188,10 @@
   innodb_thread_concurrency = 0
   innodb_parallel_read_threads = {{ ansible_processor_vcpus }}
   innodb_page_cleaners = 64 #从缓冲池实例中清除脏页的页清除器线程数，执行刷新列表和LRU刷新
-  innodb_purge_threads = 32  #清除线程数
+  #innodb_purge_threads = 4  #如果逻辑处理器 <= 16，则为 1，否则为 4
   innodb_lock_wait_timeout = 1 #InnoDB事务在放弃之前等待行锁定的秒数（行锁）
   innodb_rollback_on_timeout = on #开启事务全部回滚
-  innodb_numa_interleave = 1         #启用NUMA交错内存策略以分配InnoDB缓冲池
+  innodb_numa_interleave = 1         #启用NUMA交错内存策略以分配InnoDB缓冲池，此操作随机平衡所有 NUMA 节点的内存分配，从而在这些节点之间实现更好的分布。
   #large_pages = 1                    #启用大页内存
   innodb_online_alter_log_max_size = 1G #指定InnoDB表的在线DDL操作期间使用的临时日志文件大小的上限（超过将失效回滚）
   innodb_stats_persistent_sample_pages = 128 #估计索引列的基数和其他统计信息时要采样的索引页数
@@ -205,11 +205,17 @@
   innodb_ddl_buffer_size = 4294967295
   innodb_monitor_enable = all
   innodb_autoinc_lock_mode = 2 #表示所有情况插入都使用轻量级别的mutex锁（只针对row模式，避免auto_inc的死锁，同时在INSERT … SELECT的场景下性能会有很大提升。
+  innodb_adaptive_hash_index = 0 #一旦有写入操作，或者系统负载较高，或者读取所需的所有数据都无法缓存，自适应哈希索引就会成为巨大的瓶颈。
+  innodb_buffer_pool_in_core_file = 1#在Linux 系统上，缓冲池的内容不会转储到核心文件中。
+  innodb_doublewrite_pages = 128 #默认值越大越好，经常建议增加它
+  innodb_use_fdatasync = 1 #在支持它的系统上，除非需要，否则 fdatasync() 的调用不会刷新对文件元数据的更改。
 
 # 临时表优化
   tmp_table_size = {{ tmp_size }}
   max_heap_table_size = {{ tmp_size }}
   temptable_max_ram = {{ tmp_size }} #TempTable引擎的大小由参数temp_table_max_ram来控制，默认为1G。超过了则存储在磁盘上（ibtmp1）。
+  temptable_max_mmap = 0 #禁止从内存映射临时文件分配内存（不在 tmpdir 中创建文件）。
+  temptable_use_mmap = 0 #TempTable 存储引擎会使用 InnoDB 磁盘上的内部临时表
 
 # 是否开启死锁监测并记录至error_log
   innodb_deadlock_detect = 0
